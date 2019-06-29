@@ -1,0 +1,21 @@
+Package: graphdim
+Title: Estimate the Dimension of a Graph
+Version: 0.0.0.9000
+Authors@R: 
+    c(
+      person(given = "Karl",
+           family = "Rohe",
+           role = "aut",
+           email = "KarlRohe@wisc.edu",),
+      person(given = "Alex",
+           family = "Hayes",
+           role = c("aut", "cre"),
+           email = "alexpghayes@gmail.com",
+           comment = c(ORCID = "0000-0002-4985-5160"))
+    )
+Description: What the package does (one paragraph).
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 6.1.1
