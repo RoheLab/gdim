@@ -24,3 +24,5 @@ URL: https://github.com/alexpghayes/graphdim
 BugReports: https://github.com/alexpghayes/graphdim/issues
 Depends: 
     Matrix
+Imports: 
+    RSpectra
