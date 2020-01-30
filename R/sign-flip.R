@@ -30,9 +30,9 @@
 #'
 sf_distribution <- function(X, k, B = 1000) {
 
-  stopifnot(isSymmetric(X))
+  # stopifnot(isSymmetric(X))
 
-  splits <- split_edges(X, symmetric = TRUE)
+  splits <- split_edges(X, symmetric = TRUE, check_symmetric = FALSE)
   eig_train <- RSpectra::eigs(splits$train, k = k)
 
   lambda <- matrix(0, nrow = B, ncol = k)

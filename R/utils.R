@@ -1,6 +1,6 @@
 split_edges <- function(A, alpha = 0.05, symmetric = FALSE, check_symmetric = TRUE) {
 
-  s <- as.data.frame(summary(A))
+  s <- as.data.frame(Matrix::summary(A))
 
   if (!symmetric) {
 
