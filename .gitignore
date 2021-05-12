@@ -1,6 +1,7 @@
 # History files
 .Rhistory
 .Rapp.history
+.Rbuildignore
 
 # Session Data files
 .RData
@@ -16,7 +17,7 @@
 
 # RStudio files
 .Rproj.user/
-.Rproj
+*.Rproj
 
 # produced vignettes
 vignettes/*.html
