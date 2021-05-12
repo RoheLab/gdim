@@ -1,4 +1,9 @@
-^graphdim\.Rproj$
+^.*\.Rproj$
 ^\.Rproj\.user$
-^LICENSE\.md$
-^README\.Rmd$
+^README.Rmd
+^LICENSE.md
+^cran-comments\.md$
+^CRAN-RELEASE$
+^doc$
+^Meta$
+^\.github$

@@ -1,5 +1,6 @@
 #' @keywords internal
 #' @importFrom RSpectra eigs svds
+#' @import Matrix
 "_PACKAGE"
 
 # The following block is used by usethis to automatically manage
