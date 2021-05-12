@@ -14,13 +14,13 @@
 `gdim` is an R package for estimating graph dimension `k` (e.g., the
 number of communities in a network). The key function `eigcv` uses the
 cross-validated eigenvalues to test the statistical significance of
-sample eigenvectors. The test statistics enjoy a simple central limit
+sample eigenvectors. The test statistic enjoys a simple central limit
 theorem. As such, `eigcv` provides p-values for individual hypothesized
 `k`.
 
 ## Installation
 
-You can install from [GitHub](https://github.com/) with:
+You can install `gdim` from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
@@ -51,7 +51,7 @@ library(fastRG)
 B = matrix(0.1, 5, 5)
 diag(B) = 0.3
 sbm <- sbm(n = 1000, k = 5, B = B, expected_degree = 40)
-A <- sample_sparse(sbm, poisson_edges = T, allow_self_loops = F)
+A <- sample_sparse(sbm, poisson_edges = F, allow_self_loops = F)
 ```
 
 Here, `A` is the adjacency matrix.
@@ -69,16 +69,16 @@ eigcv(A, k_max = 10)
 #> 
 #>  ------------ Summary of Tests ------------
 #>   k       zbar      zmin         pval         padj
-#>   1 62.2108768 61.671218 0.000000e+00 0.000000e+00
-#>   2 10.2355302  8.716879 6.872015e-25 6.872015e-25
-#>   3 10.9104976  9.085051 5.134636e-28 5.134636e-28
-#>   4  9.6183780  6.874632 3.343868e-22 3.343868e-22
-#>   5  8.9396277  7.405616 1.952418e-19 1.952418e-19
-#>   6 -0.2306637 -2.036427 5.912120e-01 5.912120e-01
-#>   7 -1.6699556 -3.609351 9.525359e-01 9.525359e-01
-#>   8 -1.4463405 -4.013657 9.259591e-01 9.259591e-01
-#>   9 -0.6664051 -2.576775 7.474239e-01 7.474239e-01
-#>  10 -0.7495700 -2.479426 7.732431e-01 7.732431e-01
+#>   1 62.2747913 61.589009 0.000000e+00 0.000000e+00
+#>   2 10.9163348  9.451899 4.815205e-28 4.815205e-28
+#>   3 10.5640433  9.215151 2.187029e-26 2.187029e-26
+#>   4  9.3309331  7.086002 5.247143e-21 5.247143e-21
+#>   5  6.4823670  4.474127 4.514734e-11 4.514734e-11
+#>   6 -1.2957003 -2.066368 9.024606e-01 9.024606e-01
+#>   7 -0.7079412 -2.278473 7.605091e-01 7.605091e-01
+#>   8 -1.1075418 -2.626536 8.659701e-01 8.659701e-01
+#>   9 -1.3166394 -3.038380 9.060202e-01 9.060202e-01
+#>  10  0.1547320 -2.244862 4.385163e-01 4.385163e-01
 ```
 
 In this example, `eigcv()` suggests to choose `k=5`.

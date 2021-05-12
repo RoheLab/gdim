@@ -26,12 +26,12 @@ library(gdim)
 [![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 <!-- badges: end -->
 
-`gdim` is an R package for estimating graph dimension `k` (e.g., the number of communities in a network). The key function `eigcv` uses the cross-validated eigenvalues to test the statistical significance of sample eigenvectors. The test statistics enjoy a simple central limit theorem. As such, `eigcv` provides p-values for individual hypothesized `k`.  
+`gdim` is an R package for estimating graph dimension `k` (e.g., the number of communities in a network). The key function `eigcv` uses the cross-validated eigenvalues to test the statistical significance of sample eigenvectors. The test statistic enjoys a simple central limit theorem. As such, `eigcv` provides p-values for individual hypothesized `k`.  
 
 
 ## Installation
 
-You can install from [GitHub](https://github.com/) with:
+You can install `gdim` from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
@@ -62,7 +62,7 @@ library(fastRG)
 B = matrix(0.1, 5, 5)
 diag(B) = .3
 sbm <- sbm(n = 1000, k = 5, B = B, expected_degree = 40)
-A <- sample_sparse(sbm, poisson_edges = T, allow_self_loops = F)
+A <- sample_sparse(sbm, poisson_edges = F, allow_self_loops = F)
 ```
 Here, `A` is the adjacency matrix.
 
