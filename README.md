@@ -4,16 +4,16 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# `gdim`: Graph dimensionality
+# `gdim`: Graph dimension
 
 <!-- badges: start -->
 
 [![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 <!-- badges: end -->
 
-`gdim` is an R package for estimating graph dimensionality `k` (e.g.,
-the number of communities in a network). The key function `eigcv` uses
-the cross-validated eigenvalues to test the statistical significance of
+`gdim` is an R package for estimating graph dimension `k` (e.g., the
+number of communities in a network). The key function `eigcv` uses the
+cross-validated eigenvalues to test the statistical significance of
 sample eigenvectors. The test statistics enjoy a simple central limit
 theorem. As such, `eigcv` provides p-values for individual hypothesized
 `k`.
@@ -57,11 +57,11 @@ A <- sample_sparse(sbm, poisson_edges = T, allow_self_loops = F)
 Here, `A` is the adjacency matrix.
 
 Now, we call the `eigcv` function with `k_max=10` to estimate graph
-dimensionality.
+dimension.
 
 ``` r
 eigcv(A, k_max = 10)
-#> Estimated graph dimensionality:   5
+#> Estimated graph dimension:    5
 #> 
 #> Number of bootstraps:         10
 #> Edge splitting probabaility:  0.1
@@ -69,16 +69,16 @@ eigcv(A, k_max = 10)
 #> 
 #>  ------------ Summary of Tests ------------
 #>   k       zbar      zmin         pval         padj
-#>   1 62.0801262 61.515047 0.000000e+00 0.000000e+00
-#>   2 10.0745208  8.086710 3.580449e-24 3.580449e-24
-#>   3  9.9983025  8.410203 7.751587e-24 7.751587e-24
-#>   4  8.5536034  6.424442 5.965218e-18 5.965218e-18
-#>   5  9.4837958  8.118961 1.225988e-21 1.225988e-21
-#>   6 -0.5617609 -1.763343 7.128605e-01 7.128605e-01
-#>   7 -1.5824039 -3.940681 9.432213e-01 9.432213e-01
-#>   8 -0.6574413 -4.045873 7.445514e-01 7.445514e-01
-#>   9 -1.3668588 -2.862552 9.141652e-01 9.141652e-01
-#>  10 -1.3150209 -2.685515 9.057486e-01 9.057486e-01
+#>   1 62.2108768 61.671218 0.000000e+00 0.000000e+00
+#>   2 10.2355302  8.716879 6.872015e-25 6.872015e-25
+#>   3 10.9104976  9.085051 5.134636e-28 5.134636e-28
+#>   4  9.6183780  6.874632 3.343868e-22 3.343868e-22
+#>   5  8.9396277  7.405616 1.952418e-19 1.952418e-19
+#>   6 -0.2306637 -2.036427 5.912120e-01 5.912120e-01
+#>   7 -1.6699556 -3.609351 9.525359e-01 9.525359e-01
+#>   8 -1.4463405 -4.013657 9.259591e-01 9.259591e-01
+#>   9 -0.6664051 -2.576775 7.474239e-01 7.474239e-01
+#>  10 -0.7495700 -2.479426 7.732431e-01 7.732431e-01
 ```
 
 In this example, `eigcv()` suggests to choose `k=5`.
