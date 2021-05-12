@@ -144,9 +144,9 @@ RQ <- function(A, label){
 
 #' Stepwise Goodness-of-Fit
 #' 
-#' Perform the stepwise goodness-of-fit (StGoF) tests of graph dimensionality. 
+#' Perform the stepwise goodness-of-fit (StGoF) tests of graph dimension. 
 #' The tests are run from k=2, 3, ..., K_max separately. 
-#' Given a significance level (`alpha`), the infered graph dimensionality is 
+#' Given a significance level (`alpha`), the infered graph dimension is 
 #' determined by the first test (i.e., smallest k) that is accepted. 
 #'   
 #' @param A a `matrix` or `Matrix`, the adjacency matrix of an _undirected_ network.
@@ -154,7 +154,7 @@ RQ <- function(A, label){
 #' @param alpha `numeric(1)`, significance level, default to 0.05. 
 #'   Set `alpha=1` if you want to compute all the statistics from 1 to K_max.
 #' @return a `data.table` with three columns: 
-#' \item{k}{tested graph dimensionality.} 
+#' \item{k}{tested graph dimension.} 
 #' \item{rq.stat}{the refitted quadrilateral test statistics.} 
 #' \item{p.value}{test p-value (two-sided, no adjustment).}
 #' @references Jin, Jiashun. Fast community detection by SCORE. Ann. Statist. 43 (2015), no. 1, 57--89. doi:10.1214/14-AOS1265. \url{https://projecteuclid.org/euclid.aos/1416322036}
@@ -189,7 +189,7 @@ StGoF <- function(A, K_max, alpha = 0.05) {
 #' @return Print an `stgof` object interactively.
 #' @export
 print.stgof <- function(x, verbose = TRUE, ...) {
-  cat("Estimated graph dimensionality:\t", x$inference, fill = TRUE)
+  cat("Estimated graph dimension:\t", x$inference, fill = TRUE)
   if (verbose) {
     cat("Significance level:\t\t", x$alpha, fill = TRUE)
     cat("\n ------------ Summary of Tests ------------\n")

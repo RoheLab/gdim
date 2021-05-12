@@ -20,13 +20,13 @@ knitr::opts_chunk$set(
 library(gdim)
 ```
 
-# `gdim`: Graph dimensionality
+# `gdim`: Graph dimension
 
 <!-- badges: start -->
 [![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 <!-- badges: end -->
 
-`gdim` is an R package for estimating graph dimensionality `k` (e.g., the number of communities in a network). The key function `eigcv` uses the cross-validated eigenvalues to test the statistical significance of sample eigenvectors. The test statistics enjoy a simple central limit theorem. As such, `eigcv` provides p-values for individual hypothesized `k`.  
+`gdim` is an R package for estimating graph dimension `k` (e.g., the number of communities in a network). The key function `eigcv` uses the cross-validated eigenvalues to test the statistical significance of sample eigenvectors. The test statistics enjoy a simple central limit theorem. As such, `eigcv` provides p-values for individual hypothesized `k`.  
 
 
 ## Installation
@@ -66,7 +66,7 @@ A <- sample_sparse(sbm, poisson_edges = T, allow_self_loops = F)
 ```
 Here, `A` is the adjacency matrix.
 
-Now, we call the `eigcv` function with `k_max=10` to estimate graph dimensionality. 
+Now, we call the `eigcv` function with `k_max=10` to estimate graph dimension. 
 ```{r eigcv}
 eigcv(A, k_max = 10)
 ```

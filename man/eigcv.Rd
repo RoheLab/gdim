@@ -63,7 +63,7 @@ vectors of the (last, if \code{bootstrap>1}) training graph.}
 }
 \value{
 A \code{eigcv} object, which contains:
-\item{inference}{inferred graph dimensionality.}
+\item{inference}{inferred graph dimension.}
 \item{summary}{summary table of the tests.}
 \item{bootstrap}{number of bootstraps performed.}
 \item{split}{graph splitting probability used.}
@@ -71,8 +71,8 @@ A \code{eigcv} object, which contains:
 \item{trace}{only if \code{trace=TRUE}, the spectral decomposition of the traning graph.}
 }
 \description{
-Estimate the graph dimensionality via eigenvalue cross-validation (EigCV).
-A graph has dimensionality \code{k} if the first \code{k} eigenvectors of its adjacency
+Estimate the graph dimension via eigenvalue cross-validation (EigCV).
+A graph has dimension \code{k} if the first \code{k} eigenvectors of its adjacency
 matrix are correlated with its population eigenspace, and the others are not.
 Edge bootstrapping sub-samples the edges of the graph (without replacement).
 Edge splitting separates the edges into a training part and a testing part.

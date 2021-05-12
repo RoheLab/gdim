@@ -16,14 +16,14 @@ Set \code{alpha=1} if you want to compute all the statistics from 1 to K_max.}
 }
 \value{
 a \code{data.table} with three columns:
-\item{k}{tested graph dimensionality.}
+\item{k}{tested graph dimension.}
 \item{rq.stat}{the refitted quadrilateral test statistics.}
 \item{p.value}{test p-value (two-sided, no adjustment).}
 }
 \description{
-Perform the stepwise goodness-of-fit (StGoF) tests of graph dimensionality.
+Perform the stepwise goodness-of-fit (StGoF) tests of graph dimension.
 The tests are run from k=2, 3, ..., K_max separately.
-Given a significance level (\code{alpha}), the infered graph dimensionality is
+Given a significance level (\code{alpha}), the infered graph dimension is
 determined by the first test (i.e., smallest k) that is accepted.
 }
 \references{

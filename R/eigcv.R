@@ -1,5 +1,5 @@
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-## utility for graph dimensionality estimation 
+## utility for graph dimension estimation 
 ## 9/25/2020
 ## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 suppressPackageStartupMessages({
@@ -113,10 +113,10 @@ gspectral <- function(A, k, ...) {
   return(list(u = S$u, v = S$v))
 }
 
-#' Graph Dimensionality Statistic
+#' Graph Dimension Statistic
 #' 
 #' Given the trained left/right singular vectors, compute the test statistic for
-#' graph dimensionality. 
+#' graph dimension. 
 #' 
 #' @param full,test `matrix` or `Matrix`, the adjacency or Laplacian matrix of 
 #'   the full and test graphs. 
@@ -131,8 +131,8 @@ gdstat <- function(full, test, u, v, split) {
 
 #' Edge Bootstrapping and Splitting
 #' 
-#' Estimate the graph dimensionality via eigenvalue cross-validation (EigCV). 
-#' A graph has dimensionality `k` if the first `k` eigenvectors of its adjacency 
+#' Estimate the graph dimension via eigenvalue cross-validation (EigCV). 
+#' A graph has dimension `k` if the first `k` eigenvectors of its adjacency 
 #' matrix are correlated with its population eigenspace, and the others are not.
 #' Edge bootstrapping sub-samples the edges of the graph (without replacement). 
 #' Edge splitting separates the edges into a training part and a testing part.
@@ -165,7 +165,7 @@ gdstat <- function(full, test, u, v, split) {
 #'   `stats`, the test statistics of every bootstrap, and `pvals`, the eigen 
 #'   vectors of the (last, if `bootstrap>1`) training graph.
 #' @return A `eigcv` object, which contains:
-#'   \item{inference}{inferred graph dimensionality.} 
+#'   \item{inference}{inferred graph dimension.} 
 #'   \item{summary}{summary table of the tests.}
 #'   \item{bootstrap}{number of bootstraps performed.}
 #'   \item{split}{graph splitting probability used.} 
@@ -278,7 +278,7 @@ eigcv <- function(A, k_max,
 #' @return Print an `eigcv` object interactively.
 #' @export
 print.eigcv <- function(x, verbose = TRUE, ...) {
-  cat("Estimated graph dimensionality:\t", x$inference, fill = TRUE)
+  cat("Estimated graph dimension:\t", x$inference, fill = TRUE)
   if (verbose) {
     cat("\nNumber of bootstraps:\t\t", x$bootstrap, fill = TRUE)
     cat("Edge splitting probabaility:\t", x$split, fill = TRUE)
@@ -332,7 +332,7 @@ plot.eigcv <- function(x, type = "z", threshold = 2,
                       alpha = .8) + 
       scale_color_manual(values = c("yes" = "grey30", 
                                     "no" = "#ef3b2c")) + 
-      labs(x = "graph dimensionality", y = ylab, color = "signif.") + 
+      labs(x = "graph dimension", y = ylab, color = "signif.") + 
       geom_smooth() + 
       # scale_y_continuous(trans = "log2") + 
       theme_bw() 
@@ -354,7 +354,7 @@ plot.eigcv <- function(x, type = "z", threshold = 2,
       geom_line(alpha = .8) +
       geom_point(aes(color = .data$signif), alpha = .8) + 
       scale_color_manual(values = c("yes" = "grey30", "no" = "#ef3b2c")) + 
-      labs(x = "graph dimensionality", y = ylab, color = "signif.") + 
+      labs(x = "graph dimension", y = ylab, color = "signif.") + 
       theme_bw() 
   }
   

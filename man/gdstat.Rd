@@ -2,7 +2,7 @@
 % Please edit documentation in R/eigcv.R
 \name{gdstat}
 \alias{gdstat}
-\title{Graph Dimensionality Statistic}
+\title{Graph Dimension Statistic}
 \usage{
 gdstat(full, test, u, v, split)
 }
@@ -20,5 +20,5 @@ Must take value from (0,1).}
 }
 \description{
 Given the trained left/right singular vectors, compute the test statistic for
-graph dimensionality.
+graph dimension.
 }
