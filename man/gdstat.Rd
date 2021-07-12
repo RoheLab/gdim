@@ -16,7 +16,7 @@ the full and test graphs.}
 Must take value from (0,1).}
 }
 \value{
-\code{numeric(1)}, test statistic
+\code{numeric(3)}, test statistics
 }
 \description{
 Given the trained left/right singular vectors, compute the test statistic for

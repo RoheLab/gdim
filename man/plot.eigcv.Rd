@@ -4,18 +4,17 @@
 \alias{plot.eigcv}
 \title{Plot \code{eigcv}}
 \usage{
-\method{plot}{eigcv}(x, type = "z", threshold = 2, verbose = FALSE, ...)
+\method{plot}{eigcv}(x, type = c("z", "A", "L"), threshold = 2, ...)
 }
 \arguments{
 \item{x}{an \code{eigcv} object.}
 
-\item{type}{either "z" or "p" to specify the y-axis of the plot.
+\item{type}{either "z", "A", or "L" to specify the y-axis of the plot.
 If "z", plot the test statistics (asymptotic z score) for each k.
-If "p", plot the log10 transformed p-values.}
+If "A", plot x'Ax for each eigenvector x.
+If "L", plot x'Lx for each eigenvector x.}
 
 \item{threshold}{\code{numeric(1)}, cut-off of p-value (in log10), default to 2.}
-
-\item{verbose}{\code{logical(1)}, whether to print out the summary table.}
 
 \item{...}{ignored.}
 }

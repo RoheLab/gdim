@@ -44,7 +44,8 @@ and easy to configurable. The single required parameter for the function
 is the maximum possible dimension, `k_max`.
 
 In the following example, we generate a random graph from the stochastic
-block model (SBM) with 1000 nodes and 5 blocks.
+block model (SBM) with 1000 nodes and 5 blocks (as such, we would expect
+the estimated graph dimension to be 5).
 
 ``` r
 library(fastRG)
@@ -56,11 +57,12 @@ A <- sample_sparse(sbm, poisson_edges = F, allow_self_loops = F)
 
 Here, `A` is the adjacency matrix.
 
-Now, we call the `eigcv` function with `k_max=10` to estimate graph
+Now, we call the `eigcv()` function with `k_max=10` to estimate graph
 dimension.
 
 ``` r
-eigcv(A, k_max = 10)
+eigcv_result <- eigcv(A, k_max = 10)
+eigcv_result
 #> Estimated graph dimension:    5
 #> 
 #> Number of bootstraps:         10
@@ -68,31 +70,39 @@ eigcv(A, k_max = 10)
 #> Significance level:       0.05
 #> 
 #>  ------------ Summary of Tests ------------
-#>   k       zbar      zmin         pval         padj
-#>   1 62.2747913 61.589009 0.000000e+00 0.000000e+00
-#>   2 10.9163348  9.451899 4.815205e-28 4.815205e-28
-#>   3 10.5640433  9.215151 2.187029e-26 2.187029e-26
-#>   4  9.3309331  7.086002 5.247143e-21 5.247143e-21
-#>   5  6.4823670  4.474127 4.514734e-11 4.514734e-11
-#>   6 -1.2957003 -2.066368 9.024606e-01 9.024606e-01
-#>   7 -0.7079412 -2.278473 7.605091e-01 7.605091e-01
-#>   8 -1.1075418 -2.626536 8.659701e-01 8.659701e-01
-#>   9 -1.3166394 -3.038380 9.060202e-01 9.060202e-01
-#>  10  0.1547320 -2.244862 4.385163e-01 4.385163e-01
+#>   k          z        pvals         padj
+#>   1 41.7764210 1.000000e-32 1.000000e-32
+#>   2  7.3449938 1.028843e-13 1.028843e-13
+#>   3  6.3361165 1.178143e-10 1.178143e-10
+#>   4  5.8773752 2.084113e-09 2.084113e-09
+#>   5  6.1895117 3.017544e-10 3.017544e-10
+#>   6 -1.0575585 8.548716e-01 8.548716e-01
+#>   7 -1.0084801 8.433880e-01 8.433880e-01
+#>   8 -0.9298564 8.237773e-01 8.237773e-01
+#>   9 -0.8521407 8.029320e-01 8.029320e-01
+#>  10 -0.9469157 8.281591e-01 8.281591e-01
 ```
 
 In this example, `eigcv()` suggests to choose `k=5`.
 
 <!-- For more examples, please see the vignette:  -->
 <!-- ```{r, eval=FALSE} -->
-<!-- vignette("epca") -->
+<!-- vignette("gdim") -->
+<!-- ``` -->
+
+To visualize the result, use `plot()` which returns a `ggplot` object.
+The function displays the test statistic (z score) for each hypothesized
+graph dimension. For more options, check out the manual.
+
+<!-- ```{r plot_eigcv} -->
+<!-- plot(eigcv_result) -->
 <!-- ``` -->
 
 ## Getting help
 
 If you encounter a clear bug, please file an issue with a minimal
-reproducible example on
-[GitHub](https://github.com/RoheLab/gdim/issues).
+reproducible example on our GitHub [Issuas
+page](https://github.com/RoheLab/gdim/issues).
 
 ## Reference
 

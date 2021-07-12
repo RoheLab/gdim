@@ -9,9 +9,10 @@ suppressPackageStartupMessages({
   library(Matrix)
   # library(irlba) ## this loads `Matrix`
   library(RSpectra)
+  library(tibble)
   # library(igraph)
   library(reshape2)
-  library(metap)
+  # library(metap)
 })
 
 
@@ -42,12 +43,15 @@ esplit <- function(A, split = 0.1) {
   # stopifnot("A contains negative/fractional" = all(el$x %% 1 == 0 & el$x >= 0))
   
   ## splitting
-  leave <- (runif(nrow(el)) < split) * 1
+  # leave <- (runif(nrow(el)) < split) * 1
+  stopifnot(all.equal(el$x, as.integer(el$x)))
+  test_edges <- rbinom(nrow(el), size = el$x,prob = split)
   
   train <- sparseMatrix(
     i = el$i,
     j = el$j,
-    x = el$x * (1 - leave),
+    x = el$x - test_edges,
+    #x = el$x * (1 - leave),
     dims = dim(A), 
     dimnames = dimnames(A), 
     symmetric = isSymmetric, 
@@ -57,7 +61,8 @@ esplit <- function(A, split = 0.1) {
   test <- sparseMatrix(
     i = el$i,
     j = el$j,
-    x = el$x * leave,
+    x = test_edges,
+    # x = el$x * leave,
     dims = dim(A), 
     dimnames = dimnames(A), 
     symmetric = isSymmetric, 
@@ -102,16 +107,26 @@ glaplacian <- function(A, regularize = TRUE) {
 #' 
 #' @inheritParams esplit 
 #' @param k `integer(1)`, number of eigenvalues.
-#' @param ... additonal parameters to pass into [RSpectra::svds].
+#' @param ... additonal parameters to pass into [RSpectra::eigs] (for symmetric
+#'   `A`) or [RSpectra::svds] (for asymmetric `A`).
 #' @importFrom RSpectra eigs svds
 #' @return a list (see also [RSpectra::svds]): 
 #'   \item{u}{an `m` by `k` matrix whose columns contain the left singular vectors.}
 #'   \item{v}{an `n` by `k` matrix whose columns contain the right singular vectors.}
 gspectral <- function(A, k, ...) {
   stopifnot("k too large" = k <= min(dim(A))) 
-  S <- svds(A, k, ...)
-  return(list(u = S$u, v = S$v))
+  is_sym <- Matrix::isSymmetric(A)
+  if (is_sym) {
+    ei = RSpectra::eigs(A, k, which = "LR", ...)
+    return(list(u = ei$vect,
+                v = ei$vect,
+                d = ei$val))
+  }
+  if (!is_sym)
+    S <- RSpectra::svds(A, k, ...)
+  return(list(u = S$u, v = S$v, d = S$d))
 }
+
 
 #' Graph Dimension Statistic
 #' 
@@ -122,12 +137,20 @@ gspectral <- function(A, k, ...) {
 #'   the full and test graphs. 
 #' @param u,v `numeric` vector, the trained left and right singular vectors. 
 #' @inheritParams esplit
-#' @return `numeric(1)`, test statistic
+#' @return `numeric(3)`, test statistics
 gdstat <- function(full, test, u, v, split) {
-  se <- sqrt(as.numeric(split * t(u^2) %*% full %*% v^2)) ## standard error
-  # se <- sqrt(as.numeric(t(u^2) %*% test %*% v^2)) ## standard error
-  as.numeric(t(u) %*% test %*% v) / se ## test stat
+  if (isSymmetric(full))
+    se <- sqrt(2 * split * as.numeric(t(u ^ 2) %*% full %*% v ^ 2) -
+                 split * sum(diag(full) * u ^ 2 * v ^ 2)) ## standard error
+  if (!isSymmetric(full))
+    se <- sqrt(split * as.numeric(t(u ^ 2) %*% full %*% v ^ 2)) 
+  lamL <- as.numeric(t(u) %*% glaplacian(test / split) %*% v)
+  lamA <- as.numeric(t(u) %*% test %*% v) / split
+  z <- as.numeric(t(u) %*% test %*% v) / se ## test stat
+  return(c(cv_lambda_A = lamA, cv_lambda_L = lamL, z = z))
 }
+
+
 
 #' Edge Bootstrapping and Splitting
 #' 
@@ -148,35 +171,36 @@ gdstat <- function(full, test, u, v, split) {
 #'   If `bootstrap>1`, the test statistics will be averaged across bootstraps 
 #'   and the p-values will be calculated based on the averaged statistics. 
 #' @param alpha `numeric(1)`, significance level of each test, default to 0.05.
-#' @param meta either "z" or "p", how to aggregate bootstrap results. 
-#'   If "z", will take the average of test statistics. 
-#'   If "p", will perform meta analysis using [metap::sump]. 
+#'   This is used to cut off the dimension estimation.
 #' @param ptol `numeric(1)`, the tolerance of minimal p-value. 
-#'   This is only useful when `meta=="p"` (e.g., "bonferroni", "fdr"). 
 #' @param correct `character(1)`, correction method for multiple testing. 
 #'   This is recommended if `k_max` is large. See [p.adjust] for the acceptable 
 #'   values of `method`. If `correct` is not "none", the returned summary table
-#'   will have an extra column called `padj`.
-#' @param laplacian `logical(1)`, use the (symmetric) graph Laplacian. 
+#'   will have an extra column called `padj` that repeats the p-value in the
+#'   previous column.
+#' @param laplacian `logical(1)`, use the normalized and regularized adjacency
+#'   matrix (i.e. L)
 #' @param align `logical(1)`, align the trained singular vectors with those of
 #'   the full graph. The default is `FALSE`.
-#'   This option is experimental and does not guarantee any improvement. 
+#'   This option is experimental and should be used with caution. 
 #' @param trace `logical(1)`, for diagnostic use. If `TRUE`, return additionally 
-#'   `stats`, the test statistics of every bootstrap, and `pvals`, the eigen 
-#'   vectors of the (last, if `bootstrap>1`) training graph.
+#'   `cv_stats` containing the test statistics of every bootstrap, and if 
+#'   `align=TRUE`, then the eigs of the full graph.
 #' @return A `eigcv` object, which contains:
 #'   \item{inference}{inferred graph dimension.} 
 #'   \item{summary}{summary table of the tests.}
 #'   \item{bootstrap}{number of bootstraps performed.}
 #'   \item{split}{graph splitting probability used.} 
 #'   \item{alpha}{significance level of each test.}
-#'   \item{trace}{only if `trace=TRUE`, the spectral decomposition of the traning graph.}
-#' @importFrom dplyr bind_rows
-#' @importFrom metap logitp
+#'   \item{trace}{only if `trace=TRUE`, all bootstrapped statistics.}
+#' @importFrom tibble tibble
+#' @importFrom dplyr summarize group_by ungroup mutate summarise 
+#' @importFrom magrittr %>%
+#' @importFrom rlang .data
 #' @export
 eigcv <- function(A, k_max, 
                   bootstrap = 10, split = 0.1, 
-                  alpha = 0.05, meta = "z", 
+                  alpha = 0.05, 
                   ptol = 1e-32, correct = "none",
                   laplacian = TRUE, 
                   regularize = TRUE, 
@@ -189,7 +213,7 @@ eigcv <- function(A, k_max,
   stopifnot("\"k_max\" is too large." = k_max <= n)
   stopifnot("\"split\" must range between 0 and 1." = (split > 0 && split < 1))
   stopifnot("\"bootstrap\" must be a positive integer." = bootstrap >= 1)
-  stopifnot("Unknown \"meta\" method." = meta %in% c("z", "p"))
+  # stopifnot("Unknown \"meta\" method." = meta %in% c("z", "p"))
   
   ## full graph
   full <- A <- A * 1
@@ -200,15 +224,24 @@ eigcv <- function(A, k_max,
     gs_full <- gspectral(full, k_max)
   }
   
-  ## bootstrap 
-  stats <- sapply(seq_len(bootstrap), function(trial) {
+  cv_stats = tibble::tibble(
+    .rows = k_max * bootstrap,
+    boot = 0,
+    k = 0,
+    cv_lambda_A = 0,
+    cv_lambda_L = 0,
+    z = 0
+  )
+  tick = 0
+  
+  for (boot in 1:bootstrap) {
     ## edge splitting 
     es <- esplit(A, split)
     train <- es$train
     test <- es$test
     if (laplacian) {
       train <- glaplacian(es$train, regularize = regularize)
-      test <- glaplacian(es$test, regularize = regularize)
+      #test <- glaplacian(es$test, regularize = regularize)
     } 
     
     ## graph spectral  
@@ -225,40 +258,42 @@ eigcv <- function(A, k_max,
     }
     
     ## sequential test statistics
-    mapply(gdstat, data.frame(U), data.frame(V), USE.NAMES = FALSE,
-           MoreArgs = list(full = full, test = test, split = split))
-  })
-  dimnames(stats) <- list(k = seq_len(k_max), bootstrap = seq_len(bootstrap))
-  pvals <- pmax(pnorm(stats, lower.tail = FALSE), ptol) ## one-sided, avoid exact 0 
-  
-  ## meta bootstraps
-  zbar = rowMeans(stats)
-  zmin = apply(stats, 1, min)
-  if (meta == "z") {
-    pval <- pnorm(zbar, lower.tail = FALSE) 
-  } else if (meta == "p") {
-    pval <- apply(pvals, 1, function(p) metap::sump(p)$p) ## one-sided
+    for (k in 1:k_max) {
+      tick  = tick + 1
+      gds = gdstat(full = A, test = test, u = U[, k], v = V[, k], split = split)
+      cv_stats[tick, 1:5] = matrix(c(boot, k, gds), nrow = 1)
+    }
   }
-  tbl = data.frame(k = seq_len(k_max), 
-                   zbar = zbar, 
-                   zmin = zmin,
-                   pval = pval)
-  if (!is.null(correct)) 
-    tbl$padj <- p.adjust(p = tbl$pval, method = correct)
+  
+  ## summarize across CV/bootstrap
+  if (bootstrap > 1) {
+    cv_means = cv_stats %>% 
+      group_by(.data$k) %>% 
+      summarise(cv_lambda_A = mean(.data$cv_lambda_A), 
+                cv_lambda_L = mean(.data$cv_lambda_L),
+                z = mean(.data$z)) %>% 
+      ungroup()
+  }
+  cv_means = cv_means %>%
+    mutate(pvals = pnorm(.data$z, lower.tail = FALSE),
+           pvals = pmax(.data$pvals, ptol)) ## avoid exact 0
+  
+  ## correct for multiplicity
+  if (is.null(correct)) {correct = "none"}
+  cv_means = mutate(cv_means, padj = p.adjust(.data$pvals, method = correct))
   
   ## inference
-  criteria <- tbl[,ncol(tbl)]
+  criteria <- cv_means$padj
   k_stop <- which(criteria > alpha)
   k_infer <- ifelse(length(k_stop), min(k_stop) - 1, k_max)
   res <- list(inference = k_infer, 
-              summary = tbl, 
+              summary = cv_means, 
               bootstrap = bootstrap,
               split = split, 
               alpha = alpha)
   
   if (trace) {
-    res$stats <- stats
-    res$pvals <- pvals
+    res$stats <- cv_stats
     if (align) {
       res$spectral <- gs_full
     }
@@ -284,7 +319,7 @@ print.eigcv <- function(x, verbose = TRUE, ...) {
     cat("Edge splitting probabaility:\t", x$split, fill = TRUE)
     cat("Significance level:\t\t", x$alpha, fill = TRUE)
     cat("\n ------------ Summary of Tests ------------\n")
-    print(x$summary, row.names = FALSE)
+    print(data.frame(x$summary[,-c(2,3)]), row.names = FALSE)
     cat(fill = TRUE)
   }
 }
@@ -294,70 +329,50 @@ print.eigcv <- function(x, verbose = TRUE, ...) {
 #' @method plot eigcv
 #' 
 #' @param x an `eigcv` object.
-#' @param type either "z" or "p" to specify the y-axis of the plot. 
+#' @param type either "z", "A", or "L" to specify the y-axis of the plot. 
 #'   If "z", plot the test statistics (asymptotic z score) for each k. 
-#'   If "p", plot the log10 transformed p-values.
+#'   If "A", plot x'Ax for each eigenvector x.
+#'   If "L", plot x'Lx for each eigenvector x.
 #' @param threshold `numeric(1)`, cut-off of p-value (in log10), default to 2. 
-#' @param verbose `logical(1)`, whether to print out the summary table. 
 #' @param ... ignored.
 #' @return Plot an `eigcv` object.
 #' @importFrom ggplot2 ggplot aes labs theme_bw theme scale_color_manual
-#' @importFrom ggplot2 geom_hline geom_smooth geom_point geom_line geom_pointrange
-#' @importFrom reshape2 dcast melt
+#' @importFrom ggplot2 geom_hline geom_point geom_line scale_x_continuous
 #' @importFrom magrittr %>%
-#' @importFrom dplyr filter mutate group_by summarise
+#' @importFrom dplyr select
 #' @importFrom rlang .data
 #' @export
-plot.eigcv <- function(x, type = "z", threshold = 2, 
-                       verbose = FALSE, ...) {
-  if (type == "z") {
-    stopifnot("x must contains an object called stats." = !is.null(x$stats))
-    stopifnot("Threshold of statistics must be greater than 0." = threshold > 0)
-    ylab <- "z score"
-    yintercept = threshold
-    tbl <- x$stats %>% 
-      melt(value.name = "stat") %>%
-      filter(.data$k > 1) %>% 
-      group_by(.data$k) %>%
-      summarise(y = mean(.data$stat), 
-                ymin = min(.data$stat), 
-                ymax = max(.data$stat)) %>%
-      mutate(signif = ifelse(y < min(yintercept), "no", "yes")) 
-    g <- ggplot(aes(.data$k, .data$y), data = tbl) + 
-      geom_hline(yintercept = yintercept, alpha = .8, 
-                 linetype = 2, color = "grey60", show.legend = TRUE) + 
-      geom_pointrange(aes(ymin = .data$ymin, 
-                          ymax = .data$ymax, 
-                          color = .data$signif), 
-                      alpha = .8) + 
-      scale_color_manual(values = c("yes" = "grey30", 
-                                    "no" = "#ef3b2c")) + 
-      labs(x = "graph dimension", y = ylab, color = "signif.") + 
-      geom_smooth() + 
-      # scale_y_continuous(trans = "log2") + 
-      theme_bw() 
-  } 
+plot.eigcv <- function(x, type = c("z", "A", "L") , threshold = 2,  ...) {
   
-  if (type == "p") {
-    stopifnot("Threshold of p-value must be between 0 and 1 (preferably > 1e-20)." = 
-                threshold > 1e-20 && threshold < 1)
-    yintercept = -log10(threshold)
-    ylab <- "-log10(p-value)"
-    y <- pmin(-log10(x$summary[,ncol(x$summary)]), 20)
-    tbl <- data.frame(k = x$summary$k, y = y, 
-                      signif = ifelse(y < min(yintercept), "no", "yes")) 
-    g <- tbl %>% 
-      filter(.data$k > 1) %>% 
-      ggplot(aes(.data$k, y)) + 
-      geom_hline(yintercept = yintercept, alpha = .8, 
-                 linetype = 2, color = "grey60", show.legend = TRUE) + 
-      geom_line(alpha = .8) +
-      geom_point(aes(color = .data$signif), alpha = .8) + 
-      scale_color_manual(values = c("yes" = "grey30", "no" = "#ef3b2c")) + 
-      labs(x = "graph dimension", y = ylab, color = "signif.") + 
-      theme_bw() 
+  stopifnot("x must contains an object called stats." = !is.null(x$summary))
+  stopifnot("Threshold of statistics must be greater than 0." = threshold > 0)
+  
+  type = type[1]
+  if (type == "z") {
+    dat = x$summary %>% select(.data$k, val = .data$z)
+    ylab <- "z score"
+  }
+  if (type == "A") {
+    dat = x$summary %>% select(.data$k, val = .data$cv_lambda_A)
+    ylab <- "cross validated x' A x"
+  }
+  if (type == "L") {
+    dat = x$summary %>% select(.data$k, val = .data$cv_lambda_L)
+    ylab <- "cross validated x' L x"
   }
   
+  g <- ggplot(aes(.data$k, .data$val), data = dat) + 
+    geom_point(alpha = .8) + 
+    geom_line(color = "blue") + 
+    theme_bw()  + 
+    ggplot2::scale_x_continuous(breaks = function(x) 
+      unique(floor(pretty(seq(0, (max(x) + 1) * 1.1)))))
+  
+  if (type == "z") {
+    g = g + 
+      geom_hline(yintercept = threshold, alpha = .8, 
+                 linetype = 2, color = "grey60", show.legend = TRUE)
+  }
   return(g)
 }
 

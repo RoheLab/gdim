@@ -33,6 +33,7 @@ Imports:
     rlang,
     knitr,
     dplyr,
+    tibble,
     ggplot2,
     reshape2,
     magrittr,

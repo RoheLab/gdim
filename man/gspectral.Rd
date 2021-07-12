@@ -11,7 +11,8 @@ gspectral(A, k, ...)
 
 \item{k}{\code{integer(1)}, number of eigenvalues.}
 
-\item{...}{additonal parameters to pass into \link[RSpectra:svds]{RSpectra::svds}.}
+\item{...}{additonal parameters to pass into \link[RSpectra:eigs]{RSpectra::eigs} (for symmetric
+\code{A}) or \link[RSpectra:svds]{RSpectra::svds} (for asymmetric \code{A}).}
 }
 \value{
 a list (see also \link[RSpectra:svds]{RSpectra::svds}):

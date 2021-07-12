@@ -10,7 +10,6 @@ eigcv(
   bootstrap = 10,
   split = 0.1,
   alpha = 0.05,
-  meta = "z",
   ptol = 1e-32,
   correct = "none",
   laplacian = TRUE,
@@ -34,32 +33,30 @@ and the p-values will be calculated based on the averaged statistics.}
 \item{split}{\code{numeric(1)}, the proportion of leave-out edges (into the test set).
 Must take value from (0,1).}
 
-\item{alpha}{\code{numeric(1)}, significance level of each test, default to 0.05.}
+\item{alpha}{\code{numeric(1)}, significance level of each test, default to 0.05.
+This is used to cut off the dimension estimation.}
 
-\item{meta}{either "z" or "p", how to aggregate bootstrap results.
-If "z", will take the average of test statistics.
-If "p", will perform meta analysis using \link[metap:sump]{metap::sump}.}
-
-\item{ptol}{\code{numeric(1)}, the tolerance of minimal p-value.
-This is only useful when \code{meta=="p"} (e.g., "bonferroni", "fdr").}
+\item{ptol}{\code{numeric(1)}, the tolerance of minimal p-value.}
 
 \item{correct}{\code{character(1)}, correction method for multiple testing.
 This is recommended if \code{k_max} is large. See \link{p.adjust} for the acceptable
 values of \code{method}. If \code{correct} is not "none", the returned summary table
-will have an extra column called \code{padj}.}
+will have an extra column called \code{padj} that repeats the p-value in the
+previous column.}
 
-\item{laplacian}{\code{logical(1)}, use the (symmetric) graph Laplacian.}
+\item{laplacian}{\code{logical(1)}, use the normalized and regularized adjacency
+matrix (i.e. L)}
 
 \item{regularize}{\code{logical(1)}, return a regularized symmetric Laplacian.
 The default is \code{TRUE}. This is ignored if \code{laplacian=FALSE}.}
 
 \item{align}{\code{logical(1)}, align the trained singular vectors with those of
 the full graph. The default is \code{FALSE}.
-This option is experimental and does not guarantee any improvement.}
+This option is experimental and should be used with caution.}
 
 \item{trace}{\code{logical(1)}, for diagnostic use. If \code{TRUE}, return additionally
-\code{stats}, the test statistics of every bootstrap, and \code{pvals}, the eigen
-vectors of the (last, if \code{bootstrap>1}) training graph.}
+\code{cv_stats} containing the test statistics of every bootstrap, and if
+\code{align=TRUE}, then the eigs of the full graph.}
 }
 \value{
 A \code{eigcv} object, which contains:
@@ -68,7 +65,7 @@ A \code{eigcv} object, which contains:
 \item{bootstrap}{number of bootstraps performed.}
 \item{split}{graph splitting probability used.}
 \item{alpha}{significance level of each test.}
-\item{trace}{only if \code{trace=TRUE}, the spectral decomposition of the traning graph.}
+\item{trace}{only if \code{trace=TRUE}, all bootstrapped statistics.}
 }
 \description{
 Estimate the graph dimension via eigenvalue cross-validation (EigCV).
