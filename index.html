@@ -8,8 +8,8 @@
 <meta name="description" content="Cross-validated eigenvalues are estimated by
     splitting a graph into two parts, the training and the test graph.
     The training graph is use to estimate eigenvectors, and
-    the test graph is use to evaluate the correlation between the sample
-    eigenvectors and the eigenspace of the test graph.
+    the test graph is use to evaluate the correlation between the training
+    eigenvectors and the eigenvectors of the test graph.
     The correlations follow a simple central limit theorem that can
     be used to estimate graph dimension via hypothesis testing.">
 <title>Estimate Graph Dimension using Cross-Validated Eigenvalues • gdim</title>
@@ -21,8 +21,8 @@
 <meta property="og:description" content="Cross-validated eigenvalues are estimated by
     splitting a graph into two parts, the training and the test graph.
     The training graph is use to estimate eigenvectors, and
-    the test graph is use to evaluate the correlation between the sample
-    eigenvectors and the eigenspace of the test graph.
+    the test graph is use to evaluate the correlation between the training
+    eigenvectors and the eigenvectors of the test graph.
     The correlations follow a simple central limit theorem that can
     be used to estimate graph dimension via hypothesis testing.">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -77,7 +77,7 @@
 </h1></div>
 <!-- badges: start -->
 
-<p><code>gdim</code> estimates graph dimension using cross-validated eigenvalues, via the graph-splitting technique developed in <a href="http://arxiv.org/abs/2108.03336" class="external-link uri">http://arxiv.org/abs/2108.03336</a>. Theoretically, the method works by computing a special type of cross-validated eigenvalue which follows a simple central limit theorem. This allows users to perform hypothesis tests on the rank of the graph.</p>
+<p><code>gdim</code> estimates graph dimension using cross-validated eigenvalues, via the graph-splitting technique developed in <a href="https://arxiv.org/abs/2108.03336" class="external-link uri">https://arxiv.org/abs/2108.03336</a>. Theoretically, the method works by computing a special type of cross-validated eigenvalue which follows a simple central limit theorem. This allows users to perform hypothesis tests on the rank of the graph.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -129,16 +129,16 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  ------------ Summary of Tests ------------</span></span>
 <span><span class="co">#&gt;   k          z        pvals         padj</span></span>
-<span><span class="co">#&gt;   1 60.1118360 2.220446e-16 2.220446e-15</span></span>
-<span><span class="co">#&gt;   2 12.4766591 2.220446e-16 2.220446e-15</span></span>
-<span><span class="co">#&gt;   3 12.0401480 2.220446e-16 2.220446e-15</span></span>
-<span><span class="co">#&gt;   4 10.7393316 2.220446e-16 2.220446e-15</span></span>
-<span><span class="co">#&gt;   5  8.9024334 2.220446e-16 2.220446e-15</span></span>
-<span><span class="co">#&gt;   6 -1.1480263 8.745212e-01 1.000000e+00</span></span>
-<span><span class="co">#&gt;   7 -1.6158410 9.469357e-01 1.000000e+00</span></span>
-<span><span class="co">#&gt;   8 -0.9936334 8.397993e-01 1.000000e+00</span></span>
-<span><span class="co">#&gt;   9 -0.8575451 8.044281e-01 1.000000e+00</span></span>
-<span><span class="co">#&gt;  10 -1.1543480 8.758212e-01 1.000000e+00</span></span></code></pre></div>
+<span><span class="co">#&gt;   1 59.7488180 2.220446e-16 2.220446e-15</span></span>
+<span><span class="co">#&gt;   2 12.9094629 2.220446e-16 2.220446e-15</span></span>
+<span><span class="co">#&gt;   3 11.8600427 2.220446e-16 2.220446e-15</span></span>
+<span><span class="co">#&gt;   4 11.9412340 2.220446e-16 2.220446e-15</span></span>
+<span><span class="co">#&gt;   5  9.0252520 2.220446e-16 2.220446e-15</span></span>
+<span><span class="co">#&gt;   6 -0.8512008 8.026711e-01 1.000000e+00</span></span>
+<span><span class="co">#&gt;   7 -0.8182195 7.933841e-01 1.000000e+00</span></span>
+<span><span class="co">#&gt;   8 -0.9912649 8.392219e-01 1.000000e+00</span></span>
+<span><span class="co">#&gt;   9 -0.9005808 8.160944e-01 1.000000e+00</span></span>
+<span><span class="co">#&gt;  10 -1.1677953 8.785553e-01 1.000000e+00</span></span></code></pre></div>
 <p>In this example, <code><a href="reference/eigcv.html">eigcv()</a></code> suggests <code>k=5</code>.</p>
 <p>To visualize the result, use <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> which returns a <code>ggplot</code> object. The function displays the test statistic (z score) for each hypothesized graph dimension.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -148,7 +148,7 @@
 <div class="section level2">
 <h2 id="reference">Reference<a class="anchor" aria-label="anchor" href="#reference"></a>
 </h2>
-<p>Chen, Fan, Sebastien Roch, Karl Rohe, and Shuqi Yu. “Estimating Graph Dimension with Cross-Validated Eigenvalues.” ArXiv:2108.03336 [Cs, Math, Stat], August 6, 2021. <a href="http://arxiv.org/abs/2108.03336" class="external-link uri">http://arxiv.org/abs/2108.03336</a>.</p>
+<p>Chen, Fan, Sebastien Roch, Karl Rohe, and Shuqi Yu. “Estimating Graph Dimension with Cross-Validated Eigenvalues.” ArXiv:2108.03336 [Cs, Math, Stat], August 6, 2021. <a href="https://arxiv.org/abs/2108.03336" class="external-link uri">https://arxiv.org/abs/2108.03336</a>.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
