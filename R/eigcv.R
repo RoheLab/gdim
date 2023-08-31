@@ -1,55 +1,33 @@
 #' Graph Splitting
 #'
-#' Randomly split edges of graph into two, proportional to `1-split` and `split`.
+#' Randomly split edges of graph into two, proportional to `1-test_portion` and `test_portion`.
 #'
 #' @param A the adjacency matrix, will be coerced to a `Matrix` class.
-#' @param split `numeric(1)`, the proportion of leave-out edges (into the test set).
+#' @param test_portion `numeric(1)`, the proportion of leave-out edges (into the test set).
 #'   Must take value from (0,1).
 #' @return A list of two `Matrix` elements:
-#' \item{train}{the subgraph with `1-split` portion of edges.}
-#' \item{test}{the subgraph with `split` portion of edges.}
-# @importFrom  Matrix sparseMatrix summary drop0 isTriangular
-#' @importFrom stats rbinom runif p.adjust pnorm
-esplit <- function(A, split = 0.1) {
-  el <- Matrix::summary(A) ## edge list
-  if (is.null(el$x)) {
-    el$x <- 1
-  }
-  isSymmetric <- Matrix::isSymmetric(A)
-  if (isSymmetric) {
-    ## simplify edge list; this implies A is a square matrix
-    el <- el[el$i <= el$j, ]
-  }
-  # stopifnot("A contains negative/fractional" = all(el$x %% 1 == 0 & el$x >= 0))
+#' \item{train}{the subgraph with `1-test_portion` portion of edges.}
+#' \item{test}{the subgraph with `test_portion` portion of edges.}
+split_graph <- function(A, test_portion = 0.1) {
 
-  ## splitting
-  # leave <- (runif(nrow(el)) < split) * 1
-  stopifnot(all.equal(el$x, as.integer(el$x)))
-  test_edges <- rbinom(nrow(el), size = el$x, prob = split)
+  A <- as(A, "dMatrix")
+  A <- as(A, "TsparseMatrix")
 
-  train <- sparseMatrix(
-    i = el$i,
-    j = el$j,
-    x = el$x - test_edges,
-    # x = el$x * (1 - leave),
-    dims = dim(A),
-    dimnames = dimnames(A),
-    symmetric = isSymmetric,
-    triangular = isTriangular(A)
-  )
+  # assumes elements of A are Poisson (i.e. non-negative integers)
+  stopifnot(isTRUE(all.equal(A@x, as.integer(A@x))))
+  test_edges <- rbinom(length(A@x), size = A@x, prob = test_portion)
 
-  test <- sparseMatrix(
-    i = el$i,
-    j = el$j,
-    x = test_edges,
-    # x = el$x * leave,
-    dims = dim(A),
-    dimnames = dimnames(A),
-    symmetric = isSymmetric,
-    triangular = isTriangular(A)
-  )
+  train <- A
+  test <- A
 
-  list(train = drop0(train), test = drop0(test))
+  # use as.numeric() to match `dMatrix` data type
+  train@x <- as.numeric(train@x - test_edges)
+  test@x <- as.numeric(test_edges)
+
+  train <- as(drop0(train), "dgCMatrix")
+  test <- as(drop0(test), "dgCMatrix")
+
+  list(train = train, test = test)
 }
 
 #' Graph Laplacian
@@ -57,7 +35,7 @@ esplit <- function(A, split = 0.1) {
 #' Given an `m` by `n` graph adjacency matrix `A`, calculate the symmetric
 #' graph Laplacian.
 #'
-#' @inheritParams esplit
+#' @inheritParams split_graph
 #' @param regularize `logical(1)`, return a regularized symmetric Laplacian.
 #'   The default is `TRUE`. This is ignored if `laplacian=FALSE`.
 # @importFrom Matrix %*% Diagonal rowSums colSums
@@ -82,37 +60,6 @@ glaplacian <- function(A, regularize = TRUE) {
   return(L)
 }
 
-#' Graph Spectral Decomposition
-#'
-#' Given ab `m` by `n` graph matrix `A`, find the largest `k` singular values
-#' and the corresponding singular vectors.
-#'
-#' @inheritParams esplit
-#' @param k `integer(1)`, number of eigenvalues.
-#' @param ... additonal parameters to pass into [RSpectra::eigs] (for symmetric
-#'   `A`) or [RSpectra::svds] (for asymmetric `A`).
-#' @importFrom RSpectra eigs svds
-#' @return a list (see also [RSpectra::svds]):
-#'   \item{u}{an `m` by `k` matrix whose columns contain the left singular vectors.}
-#'   \item{v}{an `n` by `k` matrix whose columns contain the right singular vectors.}
-gspectral <- function(A, k, ...) {
-  stopifnot("k too large" = k <= min(dim(A)))
-  is_sym <- Matrix::isSymmetric(A)
-  if (is_sym) {
-    ei <- RSpectra::eigs(A, k, which = "LR", ...)
-    return(list(
-      u = ei$vect,
-      v = ei$vect,
-      d = ei$val
-    ))
-  }
-  if (!is_sym) {
-    S <- RSpectra::svds(A, k, ...)
-  }
-  return(list(u = S$u, v = S$v, d = S$d))
-}
-
-
 #' Graph Dimension Statistic
 #'
 #' Given the trained left/right singular vectors, compute the test statistic for
@@ -121,20 +68,20 @@ gspectral <- function(A, k, ...) {
 #' @param full,test `matrix` or `Matrix`, the adjacency or Laplacian matrix of
 #'   the full and test graphs.
 #' @param u,v `numeric` vector, the trained left and right singular vectors.
-#' @inheritParams esplit
+#' @inheritParams split_graph
 #' @return `numeric(3)`, test statistics
-gdstat <- function(full, test, u, v, split) {
+gdstat <- function(full, test, u, v, test_portion) {
   if (isSymmetric(full)) {
-    se <- sqrt(2 * split * as.numeric(t(u^2) %*% full %*% v^2) -
-      split * sum(diag(full) * u^2 * v^2))
+    se <- sqrt(2 * test_portion * as.numeric(t(u^2) %*% full %*% v^2) -
+      test_portion * sum(diag(full) * u^2 * v^2))
   } ## standard error
   if (!isSymmetric(full)) {
-    se <- sqrt(split * as.numeric(t(u^2) %*% full %*% v^2))
+    se <- sqrt(test_portion * as.numeric(t(u^2) %*% full %*% v^2))
   }
-  lamL <- as.numeric(t(u) %*% glaplacian(test / split) %*% v)
-  lamA <- as.numeric(t(u) %*% test %*% v) / split
+  lamL <- as.numeric(t(u) %*% glaplacian(test / test_portion) %*% v)
+  lamA <- as.numeric(t(u) %*% test %*% v) / test_portion
   z <- as.numeric(t(u) %*% test %*% v) / se ## test stat
-  return(c(cv_lambda_A = lamA, cv_lambda_L = lamL, z = z))
+  c(cv_lambda_A = lamA, cv_lambda_L = lamL, z = z)
 }
 
 
@@ -147,15 +94,14 @@ gdstat <- function(full, test, u, v, split) {
 #' Edge bootstrapping sub-samples the edges of the graph (without replacement).
 #' Edge splitting separates the edges into a training part and a testing part.
 #'
-#' @inheritParams esplit
+#' @inheritParams split_graph
 #' @inheritParams glaplacian
-#' @inheritParams gspectral
 #' @param k_max `integer(1)`, number of eigenvectors to compute.
-#' @param bootstrap `integer(1)`, number of graph bootstraps, default to 10.
+#' @param num_bootstraps `integer(1)`, number of graph bootstraps, default to 10.
 #'   Graph bootstrapping is to account for the randomness in graph splitting,
-#'   rather than obtaining any statistic (as a traditional bootstrap does).
+#'   rather than obtaining any statistic (as a traditional num_bootstraps does).
 #'   Hence, a small number (e.g., 3~10) of bootstraps usually suffices.
-#'   If `bootstrap>1`, the test statistics will be averaged across bootstraps
+#'   If `num_bootstraps>1`, the test statistics will be averaged across bootstraps
 #'   and the p-values will be calculated based on the averaged statistics.
 #' @param alpha `numeric(1)`, significance level of each test, default to 0.05.
 #'   This is used to cut off the dimension estimation.
@@ -168,34 +114,61 @@ gdstat <- function(full, test, u, v, split) {
 #' @param laplacian `logical(1)`, use the normalized and regularized adjacency
 #'   matrix (i.e. L)
 #'   This option is experimental and should be used with caution.
-#' @param trace `logical(1)`, for diagnostic use. If `TRUE`, return additionally
-#'   `cv_stats` containing the test statistics of every bootstrap, and if
-#'   `n=TRUE`, then the eigs of the full graph.
 #' @return A `eigcv` object, which contains:
-#'   \item{inference}{inferred graph dimension.}
+#'   \item{estimated_dimension}{inferred graph dimension.}
 #'   \item{summary}{summary table of the tests.}
-#'   \item{bootstrap}{number of bootstraps performed.}
-#'   \item{split}{graph splitting probability used.}
+#'   \item{num_bootstraps}{number of bootstraps performed.}
+#'   \item{test_portion}{graph splitting probability used.}
 #'   \item{alpha}{significance level of each test.}
-#'   \item{trace}{only if `trace=TRUE`, all bootstrapped statistics.}
-#' @importFrom tibble tibble
+#'
 #' @importFrom dplyr summarize group_by ungroup mutate summarise
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #' @export
+#'
+#' @examples
+#'
+#' library(fastRG)
+#'
+#' set.seed(27)
+#'
+#' B <- matrix(0.1, 5, 5)
+#' diag(B) <- 0.3
+#'
+#' model <- sbm(
+#'   n = 1000,
+#'   k = 5,
+#'   B = B,
+#'   expected_degree = 40,
+#'   poisson_edges = FALSE,
+#'   allow_self_loops = FALSE
+#' )
+#'
+#' A <- sample_sparse(model)
+#'
+#' eigcv_result <- eigcv(A, k_max = 10)
+#' eigcv_result
+#'
 eigcv <- function(A, k_max,
-                  bootstrap = 10, split = 0.1,
+                  num_bootstraps = 10, test_portion = 0.1,
                   alpha = 0.05,
                   ptol = .Machine$double.eps,
-                  correct = c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr",
-                              "none"),
-                  laplacian = TRUE,
-                  regularize = TRUE,
-                  trace = FALSE) {
+                  method = c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr",
+                             "none"),
+                  laplacian = FALSE,
+                  regularize = TRUE) {
   n <- min(dim(A))
   stopifnot("`k_max` is too large." = k_max <= n)
-  stopifnot("`split` must range between 0 and 1." = (split > 0 && split < 1))
-  stopifnot("`bootstrap` must be a positive integer." = bootstrap >= 1)
+  stopifnot("`test_portion` must range between 0 and 1." = (test_portion > 0 && test_portion < 1))
+  stopifnot("`num_bootstraps` must be a positive integer." = num_bootstraps >= 1)
+
+  method <- rlang::arg_match(method)
+
+  pb <- progress::progress_bar$new(
+    total = num_bootstraps,
+    format = "bootstrapping [:bar] :current/:total (:percent) eta: :eta"
+  )
+  pb$tick(0)
 
   ## full graph
   full <- A <- A * 1
@@ -204,40 +177,42 @@ eigcv <- function(A, k_max,
   }
 
   cv_stats <- tibble::tibble(
-    .rows = k_max * bootstrap,
+    .rows = k_max * num_bootstraps,
     boot = 0,
     k = 0,
     cv_lambda_A = 0,
     cv_lambda_L = 0,
     z = 0
   )
-  tick <- 0
 
-  for (boot in 1:bootstrap) {
-    ## edge splitting
-    es <- esplit(A, split)
+  tick <- 0
+  for (boot in 1:num_bootstraps) {
+
+    # must split on adjacency matrix A, even if computing cv-eigs for
+    # graph Laplacian
+
+    es <- split_graph(A, test_portion)
     train <- es$train
     test <- es$test
+
     if (laplacian) {
       train <- glaplacian(es$train, regularize = regularize)
     }
 
-    ## graph spectral
-    gs <- gspectral(train, k_max)
-    U <- gs$u
-    V <- gs$v
+    # train should be dgcMatrix class for max computational efficiency
+    s_train <- irlba::irlba(train, k_max)
 
-
-    ## sequential test statistics
     for (k in 1:k_max) {
       tick <- tick + 1
-      gds <- gdstat(full = A, test = test, u = U[, k], v = V[, k], split = split)
+      gds <- gdstat(full = A, test = test, u = s_train$u[, k], v = s_train$v[, k], test_portion = test_portion)
       cv_stats[tick, 1:5] <- matrix(c(boot, k, gds), nrow = 1)
     }
+
+    pb$tick()
   }
 
-  ## summarize across CV/bootstrap
-  if (bootstrap > 1) {
+  ## summarize across CV/num_bootstraps
+  if (num_bootstraps > 1) {
     cv_means <- cv_stats %>%
       group_by(.data$k) %>%
       summarise(
@@ -256,28 +231,22 @@ eigcv <- function(A, k_max,
     ) ## avoid exact 0
 
   ## correct for multiplicity
-  if (is.null(correct)) {
-    correct <- "none"
-  }
-  cv_means <- mutate(cv_means, padj = p.adjust(.data$pvals, method = correct))
+  cv_means <- mutate(cv_means, padj = p.adjust(.data$pvals, method = method))
 
   ## inference
   criteria <- cv_means$padj
   k_stop <- which(criteria > alpha)
   k_infer <- ifelse(length(k_stop), min(k_stop) - 1, k_max)
   res <- list(
-    inference = k_infer,
+    estimated_dimension = k_infer,
     summary = cv_means,
-    bootstrap = bootstrap,
-    split = split,
+    num_bootstraps = num_bootstraps,
+    test_portion = test_portion,
     alpha = alpha
   )
-
-  if (trace) {
-    res$stats <- cv_stats
-  }
+  res$stats <- cv_stats
   class(res) <- "eigcv"
-  return(res)
+  res
 }
 
 
@@ -291,9 +260,9 @@ eigcv <- function(A, k_max,
 #' @return Print an `eigcv` object interactively.
 #' @export
 print.eigcv <- function(x,  ...) {
-  cat("Estimated graph dimension:\t", x$inference, fill = TRUE)
-    cat("\nNumber of bootstraps:\t\t", x$bootstrap, fill = TRUE)
-    cat("Edge splitting probabaility:\t", x$split, fill = TRUE)
+  cat("Estimated graph dimension:\t", x$estimated_dimension, fill = TRUE)
+    cat("\nNumber of bootstraps:\t\t", x$num_bootstraps, fill = TRUE)
+    cat("Edge splitting probabaility:\t", x$test_portion, fill = TRUE)
     cat("Significance level:\t\t", x$alpha, fill = TRUE)
     cat("\n ------------ Summary of Tests ------------\n")
     print(data.frame(x$summary[, -c(2, 3)]), row.names = FALSE)
@@ -319,7 +288,6 @@ print.eigcv <- function(x,  ...) {
 #' @importFrom rlang .data
 #' @export
 plot.eigcv <- function(x, type = c("z", "A", "L"), threshold = 2, ...) {
-  stopifnot("x must contains an object called stats." = !is.null(x$summary))
   stopifnot("Threshold of statistics must be greater than 0." = threshold > 0)
 
   type <- type[1]
@@ -340,7 +308,7 @@ plot.eigcv <- function(x, type = c("z", "A", "L"), threshold = 2, ...) {
     geom_point(alpha = .8) +
     geom_line(color = "blue") +
     theme_bw() +
-    ggplot2::scale_x_continuous(breaks = function(x) {
+    scale_x_continuous(breaks = function(x) {
       unique(floor(pretty(seq(0, (max(x) + 1) * 1.1))))
     })
 
@@ -351,5 +319,6 @@ plot.eigcv <- function(x, type = c("z", "A", "L"), threshold = 2, ...) {
         linetype = 2, color = "grey60", show.legend = TRUE
       )
   }
-  return(g)
+
+  g
 }
