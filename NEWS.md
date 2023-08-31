@@ -1,3 +1,3 @@
-# gdim 0.99.0 (2021-05-07)
+# gdim (development version)
 
-* Init the R pkg repo.
+* Initial CRAN submission.
