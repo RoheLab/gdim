@@ -1,6 +1,6 @@
 Package: gdim
 Title: Estimate Graph Dimension using Cross-Validated Eigenvalues
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R: c(
     person("Fan", "Chen", , "fchen365@gmail.com", role = "aut",
            comment = c(ORCID = "0000-0003-4508-6023")),
