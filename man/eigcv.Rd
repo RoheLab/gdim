@@ -8,13 +8,12 @@ eigcv(
   A,
   k_max,
   bootstrap = 10,
-  split = 0.1,
+  test_portion = 0.1,
   alpha = 0.05,
-  ptol = 1e-32,
-  correct = "none",
+  ptol = .Machine$double.eps,
+  correct = c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none"),
   laplacian = TRUE,
   regularize = TRUE,
-  align = FALSE,
   trace = FALSE
 )
 }
@@ -30,7 +29,7 @@ Hence, a small number (e.g., 3~10) of bootstraps usually suffices.
 If \code{bootstrap>1}, the test statistics will be averaged across bootstraps
 and the p-values will be calculated based on the averaged statistics.}
 
-\item{split}{\code{numeric(1)}, the proportion of leave-out edges (into the test set).
+\item{test_portion}{\code{numeric(1)}, the proportion of leave-out edges (into the test set).
 Must take value from (0,1).}
 
 \item{alpha}{\code{numeric(1)}, significance level of each test, default to 0.05.
@@ -45,25 +44,22 @@ will have an extra column called \code{padj} that repeats the p-value in the
 previous column.}
 
 \item{laplacian}{\code{logical(1)}, use the normalized and regularized adjacency
-matrix (i.e. L)}
+matrix (i.e. L)
+This option is experimental and should be used with caution.}
 
 \item{regularize}{\code{logical(1)}, return a regularized symmetric Laplacian.
 The default is \code{TRUE}. This is ignored if \code{laplacian=FALSE}.}
 
-\item{align}{\code{logical(1)}, align the trained singular vectors with those of
-the full graph. The default is \code{FALSE}.
-This option is experimental and should be used with caution.}
-
 \item{trace}{\code{logical(1)}, for diagnostic use. If \code{TRUE}, return additionally
 \code{cv_stats} containing the test statistics of every bootstrap, and if
-\code{align=TRUE}, then the eigs of the full graph.}
+\code{n=TRUE}, then the eigs of the full graph.}
 }
 \value{
 A \code{eigcv} object, which contains:
 \item{inference}{inferred graph dimension.}
 \item{summary}{summary table of the tests.}
 \item{bootstrap}{number of bootstraps performed.}
-\item{split}{graph splitting probability used.}
+\item{test_portion}{graph splitting probability used.}
 \item{alpha}{significance level of each test.}
 \item{trace}{only if \code{trace=TRUE}, all bootstrapped statistics.}
 }

@@ -4,7 +4,7 @@
 \alias{gdstat}
 \title{Graph Dimension Statistic}
 \usage{
-gdstat(full, test, u, v, split)
+gdstat(full, test, u, v, test_portion)
 }
 \arguments{
 \item{full, test}{\code{matrix} or \code{Matrix}, the adjacency or Laplacian matrix of
@@ -12,7 +12,7 @@ the full and test graphs.}
 
 \item{u, v}{\code{numeric} vector, the trained left and right singular vectors.}
 
-\item{split}{\code{numeric(1)}, the proportion of leave-out edges (into the test set).
+\item{test_portion}{\code{numeric(1)}, the proportion of leave-out edges (into the test set).
 Must take value from (0,1).}
 }
 \value{
