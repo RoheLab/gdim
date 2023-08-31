@@ -1,23 +1,3 @@
-## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-## utility for graph dimension estimation
-## 9/25/2020
-## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-suppressPackageStartupMessages({
-  library(magrittr)
-  library(dplyr)
-  library(ggplot2)
-  library(Matrix)
-  # library(irlba) ## this loads `Matrix`
-  library(RSpectra)
-  library(tibble)
-  # library(igraph)
-  library(reshape2)
-  # library(metap)
-})
-
-
-## ---- graph dim test ----
-
 #' Graph Splitting
 #'
 #' Randomly split edges of graph into two, proportional to `1-split` and `split`.
@@ -33,7 +13,7 @@ suppressPackageStartupMessages({
 esplit <- function(A, split = 0.1) {
   el <- Matrix::summary(A) ## edge list
   if (is.null(el$x)) {
-    el$x = 1
+    el$x <- 1
   }
   isSymmetric <- Matrix::isSymmetric(A)
   if (isSymmetric) {
@@ -45,13 +25,13 @@ esplit <- function(A, split = 0.1) {
   ## splitting
   # leave <- (runif(nrow(el)) < split) * 1
   stopifnot(all.equal(el$x, as.integer(el$x)))
-  test_edges <- rbinom(nrow(el), size = el$x,prob = split)
+  test_edges <- rbinom(nrow(el), size = el$x, prob = split)
 
   train <- sparseMatrix(
     i = el$i,
     j = el$j,
     x = el$x - test_edges,
-    #x = el$x * (1 - leave),
+    # x = el$x * (1 - leave),
     dims = dim(A),
     dimnames = dimnames(A),
     symmetric = isSymmetric,
@@ -89,14 +69,16 @@ glaplacian <- function(A, regularize = TRUE) {
     tau_col <- mean(deg_col)
   } else {
     if (any(c(deg_row, deg_row) == 0)) {
-      stop("Cannot use Laplacian because some nodes are isolated. ",
-           "Set either \"regularize=TRUE\" or \"laplacian=FALSE\" option.")
+      stop(
+        "Cannot use Laplacian because some nodes are isolated. ",
+        "Set either \"regularize=TRUE\" or \"laplacian=FALSE\" option."
+      )
     }
     tau_row <- tau_col <- 0
   }
-  D_row = Diagonal(nrow(A), 1 / sqrt(deg_row + tau_row))
-  D_col = Diagonal(ncol(A), 1 / sqrt(deg_col + tau_col))
-  L = D_row %*% A %*% D_col
+  D_row <- Diagonal(nrow(A), 1 / sqrt(deg_row + tau_row))
+  D_col <- Diagonal(ncol(A), 1 / sqrt(deg_col + tau_col))
+  L <- D_row %*% A %*% D_col
   return(L)
 }
 
@@ -117,13 +99,16 @@ gspectral <- function(A, k, ...) {
   stopifnot("k too large" = k <= min(dim(A)))
   is_sym <- Matrix::isSymmetric(A)
   if (is_sym) {
-    ei = RSpectra::eigs(A, k, which = "LR", ...)
-    return(list(u = ei$vect,
-                v = ei$vect,
-                d = ei$val))
+    ei <- RSpectra::eigs(A, k, which = "LR", ...)
+    return(list(
+      u = ei$vect,
+      v = ei$vect,
+      d = ei$val
+    ))
   }
-  if (!is_sym)
+  if (!is_sym) {
     S <- RSpectra::svds(A, k, ...)
+  }
   return(list(u = S$u, v = S$v, d = S$d))
 }
 
@@ -139,11 +124,13 @@ gspectral <- function(A, k, ...) {
 #' @inheritParams esplit
 #' @return `numeric(3)`, test statistics
 gdstat <- function(full, test, u, v, split) {
-  if (isSymmetric(full))
-    se <- sqrt(2 * split * as.numeric(t(u ^ 2) %*% full %*% v ^ 2) -
-                 split * sum(diag(full) * u ^ 2 * v ^ 2)) ## standard error
-  if (!isSymmetric(full))
-    se <- sqrt(split * as.numeric(t(u ^ 2) %*% full %*% v ^ 2))
+  if (isSymmetric(full)) {
+    se <- sqrt(2 * split * as.numeric(t(u^2) %*% full %*% v^2) -
+      split * sum(diag(full) * u^2 * v^2))
+  } ## standard error
+  if (!isSymmetric(full)) {
+    se <- sqrt(split * as.numeric(t(u^2) %*% full %*% v^2))
+  }
   lamL <- as.numeric(t(u) %*% glaplacian(test / split) %*% v)
   lamA <- as.numeric(t(u) %*% test %*% v) / split
   z <- as.numeric(t(u) %*% test %*% v) / se ## test stat
@@ -209,7 +196,7 @@ eigcv <- function(A, k_max,
   ## check
   # stopifnot("A must be square"= nrow(A) == ncol(A))
   # stopifnot("A should be symmetric" = Matrix::isSymmetric(A))
-  n = min(dim(A))
+  n <- min(dim(A))
   stopifnot("\"k_max\" is too large." = k_max <= n)
   stopifnot("\"split\" must range between 0 and 1." = (split > 0 && split < 1))
   stopifnot("\"bootstrap\" must be a positive integer." = bootstrap >= 1)
@@ -224,7 +211,7 @@ eigcv <- function(A, k_max,
     gs_full <- gspectral(full, k_max)
   }
 
-  cv_stats = tibble::tibble(
+  cv_stats <- tibble::tibble(
     .rows = k_max * bootstrap,
     boot = 0,
     k = 0,
@@ -232,7 +219,7 @@ eigcv <- function(A, k_max,
     cv_lambda_L = 0,
     z = 0
   )
-  tick = 0
+  tick <- 0
 
   for (boot in 1:bootstrap) {
     ## edge splitting
@@ -241,16 +228,16 @@ eigcv <- function(A, k_max,
     test <- es$test
     if (laplacian) {
       train <- glaplacian(es$train, regularize = regularize)
-      #test <- glaplacian(es$test, regularize = regularize)
+      # test <- glaplacian(es$test, regularize = regularize)
     }
 
     ## graph spectral
     gs <- gspectral(train, k_max)
     if (align) {
       ## apply Procrustes rotation
-      Su = svd(crossprod(gs$u, gs_full$u))
+      Su <- svd(crossprod(gs$u, gs_full$u))
       U <- gs$u %*% tcrossprod(Su$u, Su$v)
-      Sv = svd(crossprod(gs$v, gs_full$v))
+      Sv <- svd(crossprod(gs$v, gs_full$v))
       V <- gs$v %*% tcrossprod(Sv$u, Sv$v)
     } else {
       U <- gs$u
@@ -259,40 +246,48 @@ eigcv <- function(A, k_max,
 
     ## sequential test statistics
     for (k in 1:k_max) {
-      tick  = tick + 1
-      gds = gdstat(full = A, test = test, u = U[, k], v = V[, k], split = split)
-      cv_stats[tick, 1:5] = matrix(c(boot, k, gds), nrow = 1)
+      tick <- tick + 1
+      gds <- gdstat(full = A, test = test, u = U[, k], v = V[, k], split = split)
+      cv_stats[tick, 1:5] <- matrix(c(boot, k, gds), nrow = 1)
     }
   }
 
   ## summarize across CV/bootstrap
   if (bootstrap > 1) {
-    cv_means = cv_stats %>%
+    cv_means <- cv_stats %>%
       group_by(.data$k) %>%
-      summarise(cv_lambda_A = mean(.data$cv_lambda_A),
-                cv_lambda_L = mean(.data$cv_lambda_L),
-                z = mean(.data$z)) %>%
+      summarise(
+        cv_lambda_A = mean(.data$cv_lambda_A),
+        cv_lambda_L = mean(.data$cv_lambda_L),
+        z = mean(.data$z)
+      ) %>%
       ungroup()
-  }else{
-    cv_means = cv_stats
+  } else {
+    cv_means <- cv_stats
   }
-  cv_means = cv_means %>%
-    mutate(pvals = pnorm(.data$z, lower.tail = FALSE),
-           pvals = pmax(.data$pvals, ptol)) ## avoid exact 0
+  cv_means <- cv_means %>%
+    mutate(
+      pvals = pnorm(.data$z, lower.tail = FALSE),
+      pvals = pmax(.data$pvals, ptol)
+    ) ## avoid exact 0
 
   ## correct for multiplicity
-  if (is.null(correct)) {correct = "none"}
-  cv_means = mutate(cv_means, padj = p.adjust(.data$pvals, method = correct))
+  if (is.null(correct)) {
+    correct <- "none"
+  }
+  cv_means <- mutate(cv_means, padj = p.adjust(.data$pvals, method = correct))
 
   ## inference
   criteria <- cv_means$padj
   k_stop <- which(criteria > alpha)
   k_infer <- ifelse(length(k_stop), min(k_stop) - 1, k_max)
-  res <- list(inference = k_infer,
-              summary = cv_means,
-              bootstrap = bootstrap,
-              split = split,
-              alpha = alpha)
+  res <- list(
+    inference = k_infer,
+    summary = cv_means,
+    bootstrap = bootstrap,
+    split = split,
+    alpha = alpha
+  )
 
   if (trace) {
     res$stats <- cv_stats
@@ -321,7 +316,7 @@ print.eigcv <- function(x, verbose = TRUE, ...) {
     cat("Edge splitting probabaility:\t", x$split, fill = TRUE)
     cat("Significance level:\t\t", x$alpha, fill = TRUE)
     cat("\n ------------ Summary of Tests ------------\n")
-    print(data.frame(x$summary[,-c(2,3)]), row.names = FALSE)
+    print(data.frame(x$summary[, -c(2, 3)]), row.names = FALSE)
     cat(fill = TRUE)
   }
 }
@@ -344,37 +339,38 @@ print.eigcv <- function(x, verbose = TRUE, ...) {
 #' @importFrom dplyr select
 #' @importFrom rlang .data
 #' @export
-plot.eigcv <- function(x, type = c("z", "A", "L") , threshold = 2,  ...) {
-
+plot.eigcv <- function(x, type = c("z", "A", "L"), threshold = 2, ...) {
   stopifnot("x must contains an object called stats." = !is.null(x$summary))
   stopifnot("Threshold of statistics must be greater than 0." = threshold > 0)
 
-  type = type[1]
+  type <- type[1]
   if (type == "z") {
-    dat = x$summary %>% select(.data$k, val = .data$z)
+    dat <- x$summary %>% select(.data$k, val = .data$z)
     ylab <- "z score"
   }
   if (type == "A") {
-    dat = x$summary %>% select(.data$k, val = .data$cv_lambda_A)
+    dat <- x$summary %>% select(.data$k, val = .data$cv_lambda_A)
     ylab <- "cross validated x' A x"
   }
   if (type == "L") {
-    dat = x$summary %>% select(.data$k, val = .data$cv_lambda_L)
+    dat <- x$summary %>% select(.data$k, val = .data$cv_lambda_L)
     ylab <- "cross validated x' L x"
   }
 
   g <- ggplot(aes(.data$k, .data$val), data = dat) +
     geom_point(alpha = .8) +
     geom_line(color = "blue") +
-    theme_bw()  +
-    ggplot2::scale_x_continuous(breaks = function(x)
-      unique(floor(pretty(seq(0, (max(x) + 1) * 1.1)))))
+    theme_bw() +
+    ggplot2::scale_x_continuous(breaks = function(x) {
+      unique(floor(pretty(seq(0, (max(x) + 1) * 1.1))))
+    })
 
   if (type == "z") {
-    g = g +
-      geom_hline(yintercept = threshold, alpha = .8,
-                 linetype = 2, color = "grey60", show.legend = TRUE)
+    g <- g +
+      geom_hline(
+        yintercept = threshold, alpha = .8,
+        linetype = 2, color = "grey60", show.legend = TRUE
+      )
   }
   return(g)
 }
-

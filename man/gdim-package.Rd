@@ -6,14 +6,7 @@
 \alias{gdim-package}
 \title{gdim: Graph Dimensionality}
 \description{
-Estimate the graph dimensionality using thecross-validated 
-    eigenvalues. The cross-validated eigenvalues are estimated by splitting 
-    a sample graph into two, the training and the test graph. The training graph
-    is use to estimate sample eigen eigenvectors, and the test graph is use to
-    evaluate the correlation between the sample eigenvectors and the eigenspace
-    of the test graph (thus the population eigenspace). The test statistics for
-    graph dimensionality follows a simple central limit theorem. The p-values 
-    are provided for each hypothesized graph dimensionality sequentially.
+Estimate the graph dimensionality using thecross-validated eigenvalues. The cross-validated eigenvalues are estimated by splitting a sample graph into two, the training and the test graph. The training graph is use to estimate sample eigen eigenvectors, and the test graph is use to evaluate the correlation between the sample eigenvectors and the eigenspace of the test graph (thus the population eigenspace). The test statistics for graph dimensionality follows a simple central limit theorem. The p-values are provided for each hypothesized graph dimensionality sequentially.
 }
 \seealso{
 Useful links:
