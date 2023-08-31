@@ -16,6 +16,8 @@ knitr::opts_chunk$set(
 # gdim
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/RoheLab/gdim/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/RoheLab/gdim/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/RoheLab/gdim/branch/master/graph/badge.svg)](https://app.codecov.io/gh/RoheLab/gdim?branch=master)
 <!-- badges: end -->
 
 `gdim` estimates graph dimension using cross-validated eigenvalues, via the graph-splitting technique developed in <http://arxiv.org/abs/2108.03336>. Theoretically, the method works by computing a special type of cross-validated eigenvalue which follows a simple central limit theorem. This allows users to perform hypothesis tests on the rank of the graph.
