@@ -12,6 +12,7 @@ Estimate the graph dimensionality using thecross-validated eigenvalues. The cros
 Useful links:
 \itemize{
   \item \url{https://github.com/RoheLab/gdim}
+  \item \url{https://rohelab.github.io/gdim/}
   \item Report bugs at \url{https://github.com/RoheLab/gdim/issues}
 }
 
