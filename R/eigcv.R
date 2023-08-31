@@ -1,21 +1,11 @@
-#' Graph Splitting
-#'
-#' Randomly split edges of graph into two, proportional to `1-test_portion` and `test_portion`.
-#'
-#' @param A the adjacency matrix, will be coerced to a `Matrix` class.
-#' @param test_portion `numeric(1)`, the proportion of leave-out edges (into the test set).
-#'   Must take value from (0,1).
-#' @return A list of two `Matrix` elements:
-#' \item{train}{the subgraph with `1-test_portion` portion of edges.}
-#' \item{test}{the subgraph with `test_portion` portion of edges.}
 split_graph <- function(A, test_portion = 0.1) {
 
-  A <- as(A, "dMatrix")
-  A <- as(A, "TsparseMatrix")
+  A <- methods::as(A, "dMatrix")
+  A <- methods::as(A, "TsparseMatrix")
 
   # assumes elements of A are Poisson (i.e. non-negative integers)
   stopifnot(isTRUE(all.equal(A@x, as.integer(A@x))))
-  test_edges <- rbinom(length(A@x), size = A@x, prob = test_portion)
+  test_edges <- stats::rbinom(length(A@x), size = A@x, prob = test_portion)
 
   train <- A
   test <- A
@@ -24,21 +14,12 @@ split_graph <- function(A, test_portion = 0.1) {
   train@x <- as.numeric(train@x - test_edges)
   test@x <- as.numeric(test_edges)
 
-  train <- as(drop0(train), "dgCMatrix")
-  test <- as(drop0(test), "dgCMatrix")
+  train <- methods::as(drop0(train), "dgCMatrix")
+  test <- methods::as(drop0(test), "dgCMatrix")
 
   list(train = train, test = test)
 }
 
-#' Graph Laplacian
-#'
-#' Given an `m` by `n` graph adjacency matrix `A`, calculate the symmetric
-#' graph Laplacian.
-#'
-#' @inheritParams split_graph
-#' @param regularize `logical(1)`, return a regularized symmetric Laplacian.
-#'   The default is `TRUE`. This is ignored if `laplacian=FALSE`.
-# @importFrom Matrix %*% Diagonal rowSums colSums
 glaplacian <- function(A, regularize = TRUE) {
   deg_row <- Matrix::rowSums(A)
   deg_col <- Matrix::colSums(A)
@@ -57,19 +38,11 @@ glaplacian <- function(A, regularize = TRUE) {
   D_row <- Diagonal(nrow(A), 1 / sqrt(deg_row + tau_row))
   D_col <- Diagonal(ncol(A), 1 / sqrt(deg_col + tau_col))
   L <- D_row %*% A %*% D_col
-  return(L)
+  L
 }
 
-#' Graph Dimension Statistic
-#'
-#' Given the trained left/right singular vectors, compute the test statistic for
-#' graph dimension.
-#'
-#' @param full,test `matrix` or `Matrix`, the adjacency or Laplacian matrix of
-#'   the full and test graphs.
-#' @param u,v `numeric` vector, the trained left and right singular vectors.
-#' @inheritParams split_graph
-#' @return `numeric(3)`, test statistics
+# Given the trained left/right singular vectors, compute the test statistic for
+# graph dimension.
 gdstat <- function(full, test, u, v, test_portion) {
   if (isSymmetric(full)) {
     se <- sqrt(2 * test_portion * as.numeric(t(u^2) %*% full %*% v^2) -
@@ -94,8 +67,7 @@ gdstat <- function(full, test, u, v, test_portion) {
 #' Edge bootstrapping sub-samples the edges of the graph (without replacement).
 #' Edge splitting separates the edges into a training part and a testing part.
 #'
-#' @inheritParams split_graph
-#' @inheritParams glaplacian
+#' @param A The adjacency matrix of graph. Must be non-negative integer valued.
 #' @param k_max `integer(1)`, number of eigenvectors to compute.
 #' @param num_bootstraps `integer(1)`, number of graph bootstraps, default to 10.
 #'   Graph bootstrapping is to account for the randomness in graph splitting,
@@ -103,14 +75,12 @@ gdstat <- function(full, test, u, v, test_portion) {
 #'   Hence, a small number (e.g., 3~10) of bootstraps usually suffices.
 #'   If `num_bootstraps>1`, the test statistics will be averaged across bootstraps
 #'   and the p-values will be calculated based on the averaged statistics.
-#' @param alpha `numeric(1)`, significance level of each test, default to 0.05.
+#' @param alpha Significance level of each test, defaults to `0.05`.
 #'   This is used to cut off the dimension estimation.
 #' @param ptol `numeric(1)`, the tolerance of minimal p-value.
-#' @param correct `character(1)`, correction method for multiple testing.
-#'   This is recommended if `k_max` is large. See [p.adjust] for the acceptable
-#'   values of `method`. If `correct` is not "none", the returned summary table
-#'   will have an extra column called `padj` that repeats the p-value in the
-#'   previous column.
+#' @param regularize TODO
+#' @param test_portion TODO
+#' @inheritParams stats::p.adjust
 #' @param laplacian `logical(1)`, use the normalized and regularized adjacency
 #'   matrix (i.e. L)
 #'   This option is experimental and should be used with caution.
@@ -150,6 +120,7 @@ gdstat <- function(full, test, u, v, test_portion) {
 #' eigcv_result
 #'
 eigcv <- function(A, k_max,
+                  ...,
                   num_bootstraps = 10, test_portion = 0.1,
                   alpha = 0.05,
                   ptol = .Machine$double.eps,
@@ -226,12 +197,12 @@ eigcv <- function(A, k_max,
   }
   cv_means <- cv_means %>%
     mutate(
-      pvals = pnorm(.data$z, lower.tail = FALSE),
+      pvals = stats::pnorm(.data$z, lower.tail = FALSE),
       pvals = pmax(.data$pvals, ptol)
     ) ## avoid exact 0
 
   ## correct for multiplicity
-  cv_means <- mutate(cv_means, padj = p.adjust(.data$pvals, method = method))
+  cv_means$padj <- stats::p.adjust(cv_means$pvals, method = method)
 
   ## inference
   criteria <- cv_means$padj
@@ -255,9 +226,7 @@ eigcv <- function(A, k_max,
 #' @method print eigcv
 #'
 #' @param x an `eigcv` object.
-#' @param verbose `logical(1)`, whether to print out the summary table.
-#' @param ... additional input to generic [print].
-#' @return Print an `eigcv` object interactively.
+#' @param ... Ignored.
 #' @export
 print.eigcv <- function(x,  ...) {
   cat("Estimated graph dimension:\t", x$estimated_dimension, fill = TRUE)

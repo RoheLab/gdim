@@ -8,6 +8,6 @@ test_that("multiplication works", {
 
   expect_equal(
     graph_parts$train + graph_parts$test,
-    as(M, "dMatrix")
+    methods::as(M, "dMatrix")
   )
 })

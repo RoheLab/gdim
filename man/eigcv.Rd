@@ -7,61 +7,51 @@
 eigcv(
   A,
   k_max,
-  bootstrap = 10,
+  ...,
+  num_bootstraps = 10,
   test_portion = 0.1,
   alpha = 0.05,
   ptol = .Machine$double.eps,
-  correct = c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none"),
-  laplacian = TRUE,
-  regularize = TRUE,
-  trace = FALSE
+  method = c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none"),
+  laplacian = FALSE,
+  regularize = TRUE
 )
 }
 \arguments{
-\item{A}{the adjacency matrix, will be coerced to a \code{Matrix} class.}
+\item{A}{The adjacency matrix of graph. Must be non-negative integer valued.}
 
 \item{k_max}{\code{integer(1)}, number of eigenvectors to compute.}
 
-\item{bootstrap}{\code{integer(1)}, number of graph bootstraps, default to 10.
+\item{num_bootstraps}{\code{integer(1)}, number of graph bootstraps, default to 10.
 Graph bootstrapping is to account for the randomness in graph splitting,
-rather than obtaining any statistic (as a traditional bootstrap does).
+rather than obtaining any statistic (as a traditional num_bootstraps does).
 Hence, a small number (e.g., 3~10) of bootstraps usually suffices.
-If \code{bootstrap>1}, the test statistics will be averaged across bootstraps
+If \code{num_bootstraps>1}, the test statistics will be averaged across bootstraps
 and the p-values will be calculated based on the averaged statistics.}
 
-\item{test_portion}{\code{numeric(1)}, the proportion of leave-out edges (into the test set).
-Must take value from (0,1).}
+\item{test_portion}{TODO}
 
-\item{alpha}{\code{numeric(1)}, significance level of each test, default to 0.05.
+\item{alpha}{Significance level of each test, defaults to \code{0.05}.
 This is used to cut off the dimension estimation.}
 
 \item{ptol}{\code{numeric(1)}, the tolerance of minimal p-value.}
 
-\item{correct}{\code{character(1)}, correction method for multiple testing.
-This is recommended if \code{k_max} is large. See \link{p.adjust} for the acceptable
-values of \code{method}. If \code{correct} is not "none", the returned summary table
-will have an extra column called \code{padj} that repeats the p-value in the
-previous column.}
+\item{method}{correction method, a \code{\link{character}} string.
+    Can be abbreviated.}
 
 \item{laplacian}{\code{logical(1)}, use the normalized and regularized adjacency
 matrix (i.e. L)
 This option is experimental and should be used with caution.}
 
-\item{regularize}{\code{logical(1)}, return a regularized symmetric Laplacian.
-The default is \code{TRUE}. This is ignored if \code{laplacian=FALSE}.}
-
-\item{trace}{\code{logical(1)}, for diagnostic use. If \code{TRUE}, return additionally
-\code{cv_stats} containing the test statistics of every bootstrap, and if
-\code{n=TRUE}, then the eigs of the full graph.}
+\item{regularize}{TODO}
 }
 \value{
 A \code{eigcv} object, which contains:
-\item{inference}{inferred graph dimension.}
+\item{estimated_dimension}{inferred graph dimension.}
 \item{summary}{summary table of the tests.}
-\item{bootstrap}{number of bootstraps performed.}
+\item{num_bootstraps}{number of bootstraps performed.}
 \item{test_portion}{graph splitting probability used.}
 \item{alpha}{significance level of each test.}
-\item{trace}{only if \code{trace=TRUE}, all bootstrapped statistics.}
 }
 \description{
 Estimate the graph dimension via eigenvalue cross-validation (EigCV).
@@ -69,4 +59,28 @@ A graph has dimension \code{k} if the first \code{k} eigenvectors of its adjacen
 matrix are correlated with its population eigenspace, and the others are not.
 Edge bootstrapping sub-samples the edges of the graph (without replacement).
 Edge splitting separates the edges into a training part and a testing part.
+}
+\examples{
+
+library(fastRG)
+
+set.seed(27)
+
+B <- matrix(0.1, 5, 5)
+diag(B) <- 0.3
+
+model <- sbm(
+  n = 1000,
+  k = 5,
+  B = B,
+  expected_degree = 40,
+  poisson_edges = FALSE,
+  allow_self_loops = FALSE
+)
+
+A <- sample_sparse(model)
+
+eigcv_result <- eigcv(A, k_max = 10)
+eigcv_result
+
 }

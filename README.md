@@ -8,6 +8,8 @@
 [![R-CMD-check](https://github.com/RoheLab/gdim/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/RoheLab/gdim/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/RoheLab/gdim/branch/main/graph/badge.svg)](https://app.codecov.io/gh/RoheLab/gdim?branch=main)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/gdim)](https://CRAN.R-project.org/package=gdim)
 <!-- badges: end -->
 
 `gdim` estimates graph dimension using cross-validated eigenvalues, via
@@ -19,11 +21,14 @@ tests on the rank of the graph.
 
 ## Installation
 
-You can install `gdim` from [GitHub](https://github.com/) with:
+You can install `gdim` from CRAN with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("RoheLab/gdim")
+install.packages("gdim")
+
+# to get the development version from GitHub:
+install.packages("pak")
+pak::pak("RoheLab/gdim")
 ```
 
 ## Example
@@ -63,6 +68,9 @@ dimension.
 library(gdim)
 
 eigcv_result <- eigcv(A, k_max = 10)
+#> 'as(<dsCMatrix>, "dgCMatrix")' is deprecated.
+#> Use 'as(., "generalMatrix")' instead.
+#> See help("Deprecated") and help("Matrix-deprecated").
 eigcv_result
 #> Estimated graph dimension:    5
 #> 
@@ -72,16 +80,16 @@ eigcv_result
 #> 
 #>  ------------ Summary of Tests ------------
 #>   k          z        pvals         padj
-#>   1 60.8793909 1.000000e-32 1.000000e-32
-#>   2 12.9226104 1.000000e-32 1.000000e-32
-#>   3 11.6415706 1.266538e-31 1.266538e-31
-#>   4 11.5093016 5.921680e-31 5.921680e-31
-#>   5 11.8647120 1.000000e-32 1.000000e-32
-#>   6 -1.5356317 9.376856e-01 9.376856e-01
-#>   7 -1.4952968 9.325815e-01 9.325815e-01
-#>   8 -0.9315610 8.242183e-01 8.242183e-01
-#>   9 -0.9875156 8.383050e-01 8.383050e-01
-#>  10 -1.5758100 9.424652e-01 9.424652e-01
+#>   1 60.1118360 2.220446e-16 2.220446e-15
+#>   2 12.4766591 2.220446e-16 2.220446e-15
+#>   3 12.0401480 2.220446e-16 2.220446e-15
+#>   4 10.7393316 2.220446e-16 2.220446e-15
+#>   5  8.9024334 2.220446e-16 2.220446e-15
+#>   6 -1.1480263 8.745212e-01 1.000000e+00
+#>   7 -1.6158410 9.469357e-01 1.000000e+00
+#>   8 -0.9936334 8.397993e-01 1.000000e+00
+#>   9 -0.8575451 8.044281e-01 1.000000e+00
+#>  10 -1.1543480 8.758212e-01 1.000000e+00
 ```
 
 In this example, `eigcv()` suggests `k=5`.

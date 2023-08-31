@@ -1,5 +1,4 @@
 #' @keywords internal
-#' @importFrom RSpectra eigs svds
 #' @import Matrix
 "_PACKAGE"
 

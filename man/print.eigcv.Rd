@@ -9,12 +9,7 @@
 \arguments{
 \item{x}{an \code{eigcv} object.}
 
-\item{...}{additional input to generic \link{print}.}
-
-\item{verbose}{\code{logical(1)}, whether to print out the summary table.}
-}
-\value{
-Print an \code{eigcv} object interactively.
+\item{...}{Ignored.}
 }
 \description{
 Print \code{eigcv}

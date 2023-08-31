@@ -1,22 +1,20 @@
 Package: gdim
-Title: Graph Dimensionality
+Title: Estimate Graph Dimension using Cross-Validated Eigenvalues
 Version: 0.0.0.9000
 Authors@R: c(
     person("Fan", "Chen", , "fchen365@gmail.com", role = "aut",
            comment = c(ORCID = "0000-0003-4508-6023")),
-    person("Alex", "Hayes", , "alexpghayes@gmail.com", role = c("cre", "aut"),
+    person("Alex", "Hayes", , "alexpghayes@gmail.com", role = c("cre", "aut", "cph"),
            comment = c(ORCID = "0000-0002-4985-5160")),
     person("Karl", "Rohe", , "karlrohe@wisc.edu", role = "aut")
   )
-Description: Estimate the graph dimensionality using thecross-validated
-    eigenvalues. The cross-validated eigenvalues are estimated by
-    splitting a sample graph into two, the training and the test graph.
-    The training graph is use to estimate sample eigen eigenvectors, and
+Description: Cross-validated eigenvalues are estimated by
+    splitting a graph into two parts, the training and the test graph.
+    The training graph is use to estimate eigenvectors, and
     the test graph is use to evaluate the correlation between the sample
-    eigenvectors and the eigenspace of the test graph (thus the population
-    eigenspace). The test statistics for graph dimensionality follows a
-    simple central limit theorem. The p-values are provided for each
-    hypothesized graph dimensionality sequentially.
+    eigenvectors and the eigenspace of the test graph.
+    The correlations follow a simple central limit theorem that can
+    be used to estimate graph dimension via hypothesis testing.
 License: GPL (>= 3)
 URL: https://github.com/RoheLab/gdim, https://rohelab.github.io/gdim/
 BugReports: https://github.com/RoheLab/gdim/issues
@@ -28,8 +26,10 @@ Imports:
     ggplot2,
     irlba,
     magrittr,
+    methods,
     progress,
     rlang,
+    stats,
     tibble
 Suggests:
     epca,

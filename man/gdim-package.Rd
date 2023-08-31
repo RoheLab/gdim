@@ -4,9 +4,9 @@
 \name{gdim-package}
 \alias{gdim}
 \alias{gdim-package}
-\title{gdim: Graph Dimensionality}
+\title{gdim: Estimate Graph Dimension using Cross-Validated Eigenvalues}
 \description{
-Estimate the graph dimensionality using thecross-validated eigenvalues. The cross-validated eigenvalues are estimated by splitting a sample graph into two, the training and the test graph. The training graph is use to estimate sample eigen eigenvectors, and the test graph is use to evaluate the correlation between the sample eigenvectors and the eigenspace of the test graph (thus the population eigenspace). The test statistics for graph dimensionality follows a simple central limit theorem. The p-values are provided for each hypothesized graph dimensionality sequentially.
+Cross-validated eigenvalues are estimated by splitting a graph into two parts, the training and the test graph. The training graph is use to estimate eigenvectors, and the test graph is use to evaluate the correlation between the sample eigenvectors and the eigenspace of the test graph. The correlations follow a simple central limit theorem that can be used to estimate graph dimension via hypothesis testing.
 }
 \seealso{
 Useful links:
@@ -18,11 +18,12 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Fan Chen \email{fan.chen@wisc.edu} (\href{https://orcid.org/0000-0003-4508-6023}{ORCID})
+\strong{Maintainer}: Alex Hayes \email{alexpghayes@gmail.com} (\href{https://orcid.org/0000-0002-4985-5160}{ORCID})
 
 Authors:
 \itemize{
-  \item Karl Rohe \email{karlrohe@stat.wisc.edu}
+  \item Fan Chen \email{fchen365@gmail.com} (\href{https://orcid.org/0000-0003-4508-6023}{ORCID})
+  \item Karl Rohe \email{karlrohe@wisc.edu}
 }
 
 }
