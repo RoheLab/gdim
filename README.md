@@ -7,7 +7,7 @@
 
 [![R-CMD-check](https://github.com/RoheLab/gdim/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/RoheLab/gdim/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
-coverage](https://codecov.io/gh/RoheLab/gdim/branch/master/graph/badge.svg)](https://app.codecov.io/gh/RoheLab/gdim?branch=master)
+coverage](https://codecov.io/gh/RoheLab/gdim/branch/main/graph/badge.svg)](https://app.codecov.io/gh/RoheLab/gdim?branch=main)
 <!-- badges: end -->
 
 `gdim` estimates graph dimension using cross-validated eigenvalues, via
@@ -71,17 +71,17 @@ eigcv_result
 #> Significance level:       0.05
 #> 
 #>  ------------ Summary of Tests ------------
-#>   k         z        pvals         padj
-#>   1 60.714642 1.000000e-32 1.000000e-32
-#>   2 12.151329 1.000000e-32 1.000000e-32
-#>   3 12.750212 1.000000e-32 1.000000e-32
-#>   4 12.571384 1.000000e-32 1.000000e-32
-#>   5 11.184326 2.432946e-29 2.432946e-29
-#>   6 -1.359304 9.129749e-01 9.129749e-01
-#>   7 -1.321162 9.067763e-01 9.067763e-01
-#>   8 -1.897079 9.710912e-01 9.710912e-01
-#>   9 -1.221527 8.890568e-01 8.890568e-01
-#>  10 -1.619458 9.473256e-01 9.473256e-01
+#>   k          z        pvals         padj
+#>   1 60.8793909 1.000000e-32 1.000000e-32
+#>   2 12.9226104 1.000000e-32 1.000000e-32
+#>   3 11.6415706 1.266538e-31 1.266538e-31
+#>   4 11.5093016 5.921680e-31 5.921680e-31
+#>   5 11.8647120 1.000000e-32 1.000000e-32
+#>   6 -1.5356317 9.376856e-01 9.376856e-01
+#>   7 -1.4952968 9.325815e-01 9.325815e-01
+#>   8 -0.9315610 8.242183e-01 8.242183e-01
+#>   9 -0.9875156 8.383050e-01 8.383050e-01
+#>  10 -1.5758100 9.424652e-01 9.424652e-01
 ```
 
 In this example, `eigcv()` suggests `k=5`.
