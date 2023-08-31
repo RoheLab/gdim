@@ -2,25 +2,61 @@
 % Please edit documentation in R/eigcv.R
 \name{plot.eigcv}
 \alias{plot.eigcv}
-\title{Plot \code{eigcv}}
+\title{Plot cross-validated eigenvalues}
 \usage{
-\method{plot}{eigcv}(x, type = c("z", "A", "L"), threshold = 2, ...)
+\method{plot}{eigcv}(x, type = c("z-score", "adjacency", "laplacian"), threshold = 2, ...)
 }
 \arguments{
-\item{x}{an \code{eigcv} object.}
+\item{x}{An \code{eigcv} object created by a call to \code{\link[=eigcv]{eigcv()}}.}
 
-\item{type}{either "z", "A", or "L" to specify the y-axis of the plot.
-If "z", plot the test statistics (asymptotic z score) for each k.
-If "A", plot x'Ax for each eigenvector x.
-If "L", plot x'Lx for each eigenvector x.}
+\item{type}{Specifies what to plot. Must be one of the following options:
+\itemize{
+\item \code{"z-score"}, in which case the Z-statistic test scores are plotted
+for each value of \code{k} (i.e. dimension of the eigenspace).
+\item \code{"adjacency"} in which case the cross-validated eigenvalues of the
+adjacency matrix are plotted for each value of \code{k}.
+\item \code{"laplacian"} in which case the cross-validated eigenvalues of the
+graph Laplacian matrix are plotted for each value of \code{k}.
+}}
 
-\item{threshold}{\code{numeric(1)}, cut-off of p-value (in log10), default to 2.}
+\item{threshold}{Only used when \code{type == "z-score"}. Adds a horizontal
+line at the value of \code{threshold}, which should be a numeric of length
+one. Defaults to \code{2}.}
 
-\item{...}{ignored.}
+\item{...}{Ignored.}
 }
 \value{
-Plot an \code{eigcv} object.
+A \code{ggplot2} object.
 }
 \description{
-Plot \code{eigcv}
+Plot cross-validated eigenvalues
+}
+\examples{
+
+library(fastRG)
+
+set.seed(27)
+
+B <- matrix(0.1, 5, 5)
+diag(B) <- 0.3
+
+model <- sbm(
+  n = 1000,
+  k = 5,
+  B = B,
+  expected_degree = 40,
+  poisson_edges = FALSE,
+  allow_self_loops = FALSE
+)
+
+A <- sample_sparse(model)
+
+eigs<- eigcv(A, k_max = 10)
+eigs
+
+plot(eigs, type = "z-score")    # default
+plot(eigs, type = "adjacency")
+plot(eigs, type = "laplacian")
+
+
 }

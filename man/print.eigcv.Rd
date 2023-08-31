@@ -2,15 +2,47 @@
 % Please edit documentation in R/eigcv.R
 \name{print.eigcv}
 \alias{print.eigcv}
-\title{Print \code{eigcv}}
+\title{Print cross-validated eigenvalues}
 \usage{
 \method{print}{eigcv}(x, ...)
 }
 \arguments{
-\item{x}{an \code{eigcv} object.}
+\item{x}{An \code{eigcv} object created by a call to \code{\link[=eigcv]{eigcv()}}.}
 
 \item{...}{Ignored.}
 }
+\value{
+\code{x}, but invisibly.
+}
 \description{
-Print \code{eigcv}
+Print cross-validated eigenvalues
+}
+\examples{
+
+library(fastRG)
+
+set.seed(27)
+
+B <- matrix(0.1, 5, 5)
+diag(B) <- 0.3
+
+model <- sbm(
+  n = 1000,
+  k = 5,
+  B = B,
+  expected_degree = 40,
+  poisson_edges = FALSE,
+  allow_self_loops = FALSE
+)
+
+A <- sample_sparse(model)
+
+eigs<- eigcv(A, k_max = 10)
+eigs
+
+plot(eigs, type = "z-score")    # default
+plot(eigs, type = "adjacency")
+plot(eigs, type = "laplacian")
+
+
 }

@@ -14,7 +14,7 @@ status](https://www.r-pkg.org/badges/version/gdim)](https://CRAN.R-project.org/p
 
 `gdim` estimates graph dimension using cross-validated eigenvalues, via
 the graph-splitting technique developed in
-<http://arxiv.org/abs/2108.03336>. Theoretically, the method works by
+<https://arxiv.org/abs/2108.03336>. Theoretically, the method works by
 computing a special type of cross-validated eigenvalue which follows a
 simple central limit theorem. This allows users to perform hypothesis
 tests on the rank of the graph.
@@ -80,16 +80,16 @@ eigcv_result
 #> 
 #>  ------------ Summary of Tests ------------
 #>   k          z        pvals         padj
-#>   1 60.1118360 2.220446e-16 2.220446e-15
-#>   2 12.4766591 2.220446e-16 2.220446e-15
-#>   3 12.0401480 2.220446e-16 2.220446e-15
-#>   4 10.7393316 2.220446e-16 2.220446e-15
-#>   5  8.9024334 2.220446e-16 2.220446e-15
-#>   6 -1.1480263 8.745212e-01 1.000000e+00
-#>   7 -1.6158410 9.469357e-01 1.000000e+00
-#>   8 -0.9936334 8.397993e-01 1.000000e+00
-#>   9 -0.8575451 8.044281e-01 1.000000e+00
-#>  10 -1.1543480 8.758212e-01 1.000000e+00
+#>   1 59.7488180 2.220446e-16 2.220446e-15
+#>   2 12.9094629 2.220446e-16 2.220446e-15
+#>   3 11.8600427 2.220446e-16 2.220446e-15
+#>   4 11.9412340 2.220446e-16 2.220446e-15
+#>   5  9.0252520 2.220446e-16 2.220446e-15
+#>   6 -0.8512008 8.026711e-01 1.000000e+00
+#>   7 -0.8182195 7.933841e-01 1.000000e+00
+#>   8 -0.9912649 8.392219e-01 1.000000e+00
+#>   9 -0.9005808 8.160944e-01 1.000000e+00
+#>  10 -1.1677953 8.785553e-01 1.000000e+00
 ```
 
 In this example, `eigcv()` suggests `k=5`.
@@ -108,4 +108,4 @@ plot(eigcv_result)
 
 Chen, Fan, Sebastien Roch, Karl Rohe, and Shuqi Yu. “Estimating Graph
 Dimension with Cross-Validated Eigenvalues.” ArXiv:2108.03336 \[Cs,
-Math, Stat\], August 6, 2021. <http://arxiv.org/abs/2108.03336>.
+Math, Stat\], August 6, 2021. <https://arxiv.org/abs/2108.03336>.

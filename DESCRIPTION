@@ -11,8 +11,8 @@ Authors@R: c(
 Description: Cross-validated eigenvalues are estimated by
     splitting a graph into two parts, the training and the test graph.
     The training graph is use to estimate eigenvectors, and
-    the test graph is use to evaluate the correlation between the sample
-    eigenvectors and the eigenspace of the test graph.
+    the test graph is use to evaluate the correlation between the training
+    eigenvectors and the eigenvectors of the test graph.
     The correlations follow a simple central limit theorem that can
     be used to estimate graph dimension via hypothesis testing.
 License: GPL (>= 3)

@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 [![CRAN status](https://www.r-pkg.org/badges/version/gdim)](https://CRAN.R-project.org/package=gdim)
 <!-- badges: end -->
 
-`gdim` estimates graph dimension using cross-validated eigenvalues, via the graph-splitting technique developed in <http://arxiv.org/abs/2108.03336>. Theoretically, the method works by computing a special type of cross-validated eigenvalue which follows a simple central limit theorem. This allows users to perform hypothesis tests on the rank of the graph.
+`gdim` estimates graph dimension using cross-validated eigenvalues, via the graph-splitting technique developed in <https://arxiv.org/abs/2108.03336>. Theoretically, the method works by computing a special type of cross-validated eigenvalue which follows a simple central limit theorem. This allows users to perform hypothesis tests on the rank of the graph.
 
 ## Installation
 
@@ -77,4 +77,4 @@ plot(eigcv_result)
 
 ## Reference
 
-Chen, Fan, Sebastien Roch, Karl Rohe, and Shuqi Yu. “Estimating Graph Dimension with Cross-Validated Eigenvalues.” ArXiv:2108.03336 [Cs, Math, Stat], August 6, 2021. http://arxiv.org/abs/2108.03336.
+Chen, Fan, Sebastien Roch, Karl Rohe, and Shuqi Yu. “Estimating Graph Dimension with Cross-Validated Eigenvalues.” ArXiv:2108.03336 [Cs, Math, Stat], August 6, 2021. https://arxiv.org/abs/2108.03336.

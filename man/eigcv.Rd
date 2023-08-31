@@ -2,7 +2,7 @@
 % Please edit documentation in R/eigcv.R
 \name{eigcv}
 \alias{eigcv}
-\title{Edge Bootstrapping and Splitting}
+\title{Compute cross-validate eigenvalues}
 \usage{
 eigcv(
   A,
@@ -11,50 +11,66 @@ eigcv(
   num_bootstraps = 10,
   test_portion = 0.1,
   alpha = 0.05,
-  ptol = .Machine$double.eps,
-  method = c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none"),
+  method = c("none", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr"),
   laplacian = FALSE,
   regularize = TRUE
 )
 }
 \arguments{
-\item{A}{The adjacency matrix of graph. Must be non-negative integer valued.}
+\item{A}{The adjacency matrix of graph. Must be non-negative and
+integer valued.}
 
-\item{k_max}{\code{integer(1)}, number of eigenvectors to compute.}
+\item{k_max}{The maximum dimension of the graph to consider. This many
+eigenvectors are computed. Should be a non-negative integer smallish
+relative the dimensions of \code{A}.}
 
-\item{num_bootstraps}{\code{integer(1)}, number of graph bootstraps, default to 10.
-Graph bootstrapping is to account for the randomness in graph splitting,
-rather than obtaining any statistic (as a traditional num_bootstraps does).
-Hence, a small number (e.g., 3~10) of bootstraps usually suffices.
-If \code{num_bootstraps>1}, the test statistics will be averaged across bootstraps
+\item{...}{Ignored.}
+
+\item{num_bootstraps}{The number of times to bootstrap the graph. Since
+cross-validated eigenvalues are based on a random graph split, they
+are themselves random. By repeatedly computing cross-validated eigenvalues
+for different sample splits, the idea is to smooth away some of the
+randomness due to the graph splits. A small number of bootstraps
+(3 to 10) usually suffices. Defaults to \code{10}. Test statistics (i.e.
+z-scores for cv eigenvalues) are averaged across bootstraps
 and the p-values will be calculated based on the averaged statistics.}
 
-\item{test_portion}{TODO}
+\item{test_portion}{The portion of the graph to put into the test graph,
+as opposed to the training graph. Defaults to \code{0.1}. Must be strictly
+between zero and one.}
 
-\item{alpha}{Significance level of each test, defaults to \code{0.05}.
-This is used to cut off the dimension estimation.}
+\item{alpha}{Significance level for hypothesis tests. Each dimension
+\verb{1, ..., k_max} is tested when estimating graph dimension, and the
+overall graph dimension is taken to be the smallest number of dimensions
+such that all the tests reject.}
 
-\item{ptol}{\code{numeric(1)}, the tolerance of minimal p-value.}
+\item{method}{Method to adjust p-values for multiple testing. Must be
+one of \code{"none"}, \code{"holm"}, \code{"hochberg"}, \code{"hommel"}, \code{"bonferroni"},
+\code{"BH"}, \code{"BY"}, or \code{"fdr"}. Passed to \code{\link[stats:p.adjust]{stats::p.adjust()}}. Defaults to
+\code{"none"}.}
 
-\item{method}{correction method, a \code{\link{character}} string.
-    Can be abbreviated.}
+\item{laplacian}{Logical value indicating where to compute cross-validated
+eigenvalues for the degree-normalize graph Laplacian rather than the
+graph adjacency matrix. Experimental and should be used with caution.
+Defaults to \code{FALSE}.}
 
-\item{laplacian}{\code{logical(1)}, use the normalized and regularized adjacency
-matrix (i.e. L)
-This option is experimental and should be used with caution.}
-
-\item{regularize}{TODO}
+\item{regularize}{Only applicable when \code{laplacian == TRUE}, in which case
+this parameter controls whether or not the degree-normalized graph
+Laplacian is regularized. Defaults to \code{TRUE}.}
 }
 \value{
-A \code{eigcv} object, which contains:
-\item{estimated_dimension}{inferred graph dimension.}
-\item{summary}{summary table of the tests.}
-\item{num_bootstraps}{number of bootstraps performed.}
-\item{test_portion}{graph splitting probability used.}
-\item{alpha}{significance level of each test.}
+A \code{eigcv} object, which is a list with the following named
+elements.
+\itemize{
+\item \code{estimated_dimension}: inferred graph dimension.
+\item \code{summary}: summary table of the tests.
+\item \code{num_bootstraps}: number of bootstraps performed.
+\item \code{test_portion}: graph splitting probability used.
+\item \code{alpha}: significance level of each test.
+}
 }
 \description{
-Estimate the graph dimension via eigenvalue cross-validation (EigCV).
+Estimate graph dimension via eigenvalue cross-validation (EigCV).
 A graph has dimension \code{k} if the first \code{k} eigenvectors of its adjacency
 matrix are correlated with its population eigenspace, and the others are not.
 Edge bootstrapping sub-samples the edges of the graph (without replacement).
@@ -80,7 +96,12 @@ model <- sbm(
 
 A <- sample_sparse(model)
 
-eigcv_result <- eigcv(A, k_max = 10)
-eigcv_result
+eigs<- eigcv(A, k_max = 10)
+eigs
+
+plot(eigs, type = "z-score")    # default
+plot(eigs, type = "adjacency")
+plot(eigs, type = "laplacian")
+
 
 }
