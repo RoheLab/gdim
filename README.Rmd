@@ -1,36 +1,24 @@
 ---
-# date: "`r Sys.Date()`"
-output: 
-  github_document:
-    # fig_width: 3
-    fig_height: 3
-header-includes:
-  - \usepackage{amsfonts,amsmath,amsthm,amsbsy,amssymb,dsfont,bm,mathtools,mathalfa}
+output: github_document
 ---
-
-<!-- README.md is generated from README.Rmd. Please edit that file -->
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  tidy = TRUE, 
-  tidy.opts = list(comment = FALSE),
   collapse = TRUE,
   comment = "#>",
+  fig.path = "man/figures/README-",
   out.width = "100%"
 )
-library(gdim)
 ```
 
-# `gdim`: Graph dimension
+# gdim
 
 <!-- badges: start -->
-[![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 <!-- badges: end -->
 
-`gdim` is an R package for estimating graph dimension `k` (e.g., the number of communities in a network). The key function `eigcv` uses the cross-validated eigenvalues to test the statistical significance of sample eigenvectors. The test statistic enjoys a simple central limit theorem. As such, `eigcv` provides p-values for individual hypothesized `k`.  
-
+`gdim` estimates graph dimension using cross-validated eigenvalues, via the graph-splitting technique developed in <http://arxiv.org/abs/2108.03336>. Theoretically, the method works by computing a special type of cross-validated eigenvalue which follows a simple central limit theorem. This allows users to perform hypothesis tests on the rank of the graph.
 
 ## Installation
 
@@ -41,59 +29,46 @@ You can install `gdim` from [GitHub](https://github.com/) with:
 devtools::install_github("RoheLab/gdim")
 ```
 
-<!-- You can install the released version of epca from [CRAN](https://CRAN.R-project.org) with: -->
-
-<!-- ``` r -->
-<!-- install.packages("gdim") -->
-<!-- ``` -->
-
-<!-- or the development version from [GitHub](https://github.com/) with: -->
-
-<!-- ``` r -->
-<!-- # install.packages("devtools") -->
-<!-- devtools::install_github("RoheLab/gdim") -->
-<!-- ``` -->
-
 ## Example
 
-`eigcv()` is the main function in `gdim`. The function is simple to use and easy to configurable. The single required parameter for the function is the maximum possible dimension, `k_max`. 
+`eigcv()` is the main function in `gdim`. The single required parameter for the function is the maximum possible dimension, `k_max`. 
 
 In the following example, we generate a random graph from the stochastic block model (SBM) with 1000 nodes and 5 blocks (as such, we would expect the estimated graph dimension to be 5). 
 
-```{r sbm}
+```{r}
 library(fastRG)
-B = matrix(0.1, 5, 5)
-diag(B) = .3
-sbm <- sbm(n = 1000, k = 5, B = B, expected_degree = 40)
-A <- sample_sparse(sbm, poisson_edges = F, allow_self_loops = F)
+
+B <- matrix(0.1, 5, 5)
+diag(B) <- 0.3
+
+model <- sbm(
+  n = 1000,
+  k = 5,
+  B = B,
+  expected_degree = 40,
+  poisson_edges = FALSE,
+  allow_self_loops = FALSE
+)
+
+A <- sample_sparse(model)
 ```
 Here, `A` is the adjacency matrix.
 
 Now, we call the `eigcv()` function with `k_max=10` to estimate graph dimension. 
 ```{r eigcv}
+library(gdim)
+
 eigcv_result <- eigcv(A, k_max = 10)
 eigcv_result
 ```
-In this example, `eigcv()` suggests to choose `k=5`. 
+In this example, `eigcv()` suggests `k=5`. 
 
-<!-- For more examples, please see the vignette:  -->
-<!-- ```{r, eval=FALSE} -->
-<!-- vignette("gdim") -->
-<!-- ``` -->
+To visualize the result, use `plot()` which returns a `ggplot` object. The function displays the test statistic (z score) for each hypothesized graph dimension.
 
-To visualize the result, use `plot()` which returns a `ggplot` object. 
-The function displays the test statistic (z score) for each hypothesized graph dimension. For more options, check out the manual. 
-
-<!-- ```{r plot_eigcv} -->
-<!-- plot(eigcv_result) -->
-<!-- ``` -->
-
-## Getting help
-
-If you encounter a clear bug, please file an issue with a minimal reproducible example on our GitHub [Issuas page](https://github.com/RoheLab/gdim/issues).
-
+```{r}
+plot(eigcv_result)
+```
 
 ## Reference
 
-Chen F, Roch S, Rohe K, & Yu S. "Estimating graph dimension with cross-validated eigenvalues." *In preparation*.
-
+Chen, Fan, Sebastien Roch, Karl Rohe, and Shuqi Yu. “Estimating Graph Dimension with Cross-Validated Eigenvalues.” ArXiv:2108.03336 [Cs, Math, Stat], August 6, 2021. http://arxiv.org/abs/2108.03336.
