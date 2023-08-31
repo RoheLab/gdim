@@ -2,9 +2,11 @@ Package: gdim
 Title: Graph Dimensionality
 Version: 0.0.0.9000
 Authors@R: c(
-    person("Fan", "Chen", , "fan.chen@wisc.edu", role = c("aut", "cre"),
+    person("Fan", "Chen", , "fchen365@gmail.com", role = "aut",
            comment = c(ORCID = "0000-0003-4508-6023")),
-    person("Karl", "Rohe", , "karlrohe@stat.wisc.edu", role = "aut")
+    person("Alex", "Hayes", , "alexpghayes@gmail.com", role = c("cre", "aut"),
+           comment = c(ORCID = "0000-0002-4985-5160")),
+    person("Karl", "Rohe", , "karlrohe@wisc.edu", role = "aut")
   )
 Description: Estimate the graph dimensionality using thecross-validated
     eigenvalues. The cross-validated eigenvalues are estimated by
@@ -24,13 +26,16 @@ Depends:
 Imports: 
     dplyr,
     ggplot2,
+    irlba,
     magrittr,
+    progress,
     rlang,
-    RSpectra,
     tibble
 Suggests:
     epca,
-    fastRG
+    fastRG,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
