@@ -66,43 +66,42 @@ Edge splitting separates the edges into a training part and a testing part.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">eigcv</span><span class="op">(</span></span>
 <span>  <span class="va">A</span>,</span>
 <span>  <span class="va">k_max</span>,</span>
-<span>  bootstrap <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  num_bootstraps <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  test_portion <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  ptol <span class="op">=</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span>,</span>
-<span>  correct <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"holm"</span>, <span class="st">"hochberg"</span>, <span class="st">"hommel"</span>, <span class="st">"bonferroni"</span>, <span class="st">"BH"</span>, <span class="st">"BY"</span>, <span class="st">"fdr"</span>, <span class="st">"none"</span><span class="op">)</span>,</span>
-<span>  laplacian <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  regularize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  trace <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"holm"</span>, <span class="st">"hochberg"</span>, <span class="st">"hommel"</span>, <span class="st">"bonferroni"</span>, <span class="st">"BH"</span>, <span class="st">"BY"</span>, <span class="st">"fdr"</span>, <span class="st">"none"</span><span class="op">)</span>,</span>
+<span>  laplacian <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  regularize <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>A</dt>
-<dd><p>the adjacency matrix, will be coerced to a <code>Matrix</code> class.</p></dd>
+<dd><p>The adjacency matrix of graph. Must be non-negative integer valued.</p></dd>
 
 
 <dt>k_max</dt>
 <dd><p><code>integer(1)</code>, number of eigenvectors to compute.</p></dd>
 
 
-<dt>bootstrap</dt>
+<dt>num_bootstraps</dt>
 <dd><p><code>integer(1)</code>, number of graph bootstraps, default to 10.
 Graph bootstrapping is to account for the randomness in graph splitting,
-rather than obtaining any statistic (as a traditional bootstrap does).
+rather than obtaining any statistic (as a traditional num_bootstraps does).
 Hence, a small number (e.g., 3~10) of bootstraps usually suffices.
-If <code>bootstrap&gt;1</code>, the test statistics will be averaged across bootstraps
+If <code>num_bootstraps&gt;1</code>, the test statistics will be averaged across bootstraps
 and the p-values will be calculated based on the averaged statistics.</p></dd>
 
 
 <dt>test_portion</dt>
-<dd><p><code>numeric(1)</code>, the proportion of leave-out edges (into the test set).
-Must take value from (0,1).</p></dd>
+<dd><p>TODO</p></dd>
 
 
 <dt>alpha</dt>
-<dd><p><code>numeric(1)</code>, significance level of each test, default to 0.05.
+<dd><p>Significance level of each test, defaults to <code>0.05</code>.
 This is used to cut off the dimension estimation.</p></dd>
 
 
@@ -110,12 +109,9 @@ This is used to cut off the dimension estimation.</p></dd>
 <dd><p><code>numeric(1)</code>, the tolerance of minimal p-value.</p></dd>
 
 
-<dt>correct</dt>
-<dd><p><code>character(1)</code>, correction method for multiple testing.
-This is recommended if <code>k_max</code> is large. See <a href="https://rdrr.io/r/stats/p.adjust.html" class="external-link">p.adjust</a> for the acceptable
-values of <code>method</code>. If <code>correct</code> is not "none", the returned summary table
-will have an extra column called <code>padj</code> that repeats the p-value in the
-previous column.</p></dd>
+<dt>method</dt>
+<dd><p>correction method, a <code><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></code> string.
+    Can be abbreviated.</p></dd>
 
 
 <dt>laplacian</dt>
@@ -125,14 +121,7 @@ This option is experimental and should be used with caution.</p></dd>
 
 
 <dt>regularize</dt>
-<dd><p><code>logical(1)</code>, return a regularized symmetric Laplacian.
-The default is <code>TRUE</code>. This is ignored if <code>laplacian=FALSE</code>.</p></dd>
-
-
-<dt>trace</dt>
-<dd><p><code>logical(1)</code>, for diagnostic use. If <code>TRUE</code>, return additionally
-<code>cv_stats</code> containing the test statistics of every bootstrap, and if
-<code>n=TRUE</code>, then the eigs of the full graph.</p></dd>
+<dd><p>TODO</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -140,13 +129,13 @@ The default is <code>TRUE</code>. This is ignored if <code>laplacian=FALSE</code
     
 
 <p>A <code>eigcv</code> object, which contains:</p>
-<dl><dt>inference</dt>
+<dl><dt>estimated_dimension</dt>
 <dd><p>inferred graph dimension.</p></dd>
 
 <dt>summary</dt>
 <dd><p>summary table of the tests.</p></dd>
 
-<dt>bootstrap</dt>
+<dt>num_bootstraps</dt>
 <dd><p>number of bootstraps performed.</p></dd>
 
 <dt>test_portion</dt>
@@ -155,11 +144,56 @@ The default is <code>TRUE</code>. This is ignored if <code>laplacian=FALSE</code
 <dt>alpha</dt>
 <dd><p>significance level of each test.</p></dd>
 
-<dt>trace</dt>
-<dd><p>only if <code>trace=TRUE</code>, all bootstrapped statistics.</p></dd>
-
 </dl></div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rohelab.github.io/fastRG/" class="external-link">fastRG</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">27</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">B</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">B</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fl">0.3</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rohelab.github.io/fastRG/reference/sbm.html" class="external-link">sbm</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  n <span class="op">=</span> <span class="fl">1000</span>,</span></span>
+<span class="r-in"><span>  k <span class="op">=</span> <span class="fl">5</span>,</span></span>
+<span class="r-in"><span>  B <span class="op">=</span> <span class="va">B</span>,</span></span>
+<span class="r-in"><span>  expected_degree <span class="op">=</span> <span class="fl">40</span>,</span></span>
+<span class="r-in"><span>  poisson_edges <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>  allow_self_loops <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">A</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rohelab.github.io/fastRG/reference/sample_sparse.html" class="external-link">sample_sparse</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">eigcv_result</span> <span class="op">&lt;-</span> <span class="fu">eigcv</span><span class="op">(</span><span class="va">A</span>, k_max <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 'as(&lt;dsCMatrix&gt;, "dgCMatrix")' is deprecated.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Use 'as(., "generalMatrix")' instead.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> See help("Deprecated") and help("Matrix-deprecated").</span>
+<span class="r-in"><span><span class="va">eigcv_result</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Estimated graph dimension:	 5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Number of bootstraps:		 10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Edge splitting probabaility:	 0.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Significance level:		 0.05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ------------ Summary of Tests ------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   k          z        pvals         padj</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   1 60.0858888 2.220446e-16 2.220446e-15</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   2 11.7538714 2.220446e-16 2.220446e-15</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   3 11.1552401 2.220446e-16 2.220446e-15</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   4 11.3242906 2.220446e-16 2.220446e-15</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   5  9.5379830 2.220446e-16 2.220446e-15</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   6 -1.1633387 8.776540e-01 1.000000e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   7 -1.2996582 9.031409e-01 1.000000e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   8 -1.1750915 8.800209e-01 1.000000e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   9 -1.1354378 8.719040e-01 1.000000e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  10 -0.8694766 8.077067e-01 1.000000e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 
