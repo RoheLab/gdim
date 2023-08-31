@@ -19,19 +19,7 @@
     <loc>https://rohelab.github.io/gdim/news/index.html</loc>
   </url>
   <url>
-    <loc>https://rohelab.github.io/gdim/reference/RQ.html</loc>
-  </url>
-  <url>
-    <loc>https://rohelab.github.io/gdim/reference/SCORE.html</loc>
-  </url>
-  <url>
-    <loc>https://rohelab.github.io/gdim/reference/StGoF.html</loc>
-  </url>
-  <url>
     <loc>https://rohelab.github.io/gdim/reference/eigcv.html</loc>
-  </url>
-  <url>
-    <loc>https://rohelab.github.io/gdim/reference/esplit.html</loc>
   </url>
   <url>
     <loc>https://rohelab.github.io/gdim/reference/gdim-package.html</loc>
@@ -55,9 +43,6 @@
     <loc>https://rohelab.github.io/gdim/reference/print.eigcv.html</loc>
   </url>
   <url>
-    <loc>https://rohelab.github.io/gdim/reference/print.stgof.html</loc>
-  </url>
-  <url>
-    <loc>https://rohelab.github.io/gdim/reference/z2Z.html</loc>
+    <loc>https://rohelab.github.io/gdim/reference/split_graph.html</loc>
   </url>
 </urlset>

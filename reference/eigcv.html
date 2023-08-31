@@ -67,13 +67,12 @@ Edge splitting separates the edges into a training part and a testing part.</p>
 <span>  <span class="va">A</span>,</span>
 <span>  <span class="va">k_max</span>,</span>
 <span>  bootstrap <span class="op">=</span> <span class="fl">10</span>,</span>
-<span>  split <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  test_portion <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
-<span>  ptol <span class="op">=</span> <span class="fl">1e-32</span>,</span>
-<span>  correct <span class="op">=</span> <span class="st">"none"</span>,</span>
+<span>  ptol <span class="op">=</span> <span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span>,</span>
+<span>  correct <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"holm"</span>, <span class="st">"hochberg"</span>, <span class="st">"hommel"</span>, <span class="st">"bonferroni"</span>, <span class="st">"BH"</span>, <span class="st">"BY"</span>, <span class="st">"fdr"</span>, <span class="st">"none"</span><span class="op">)</span>,</span>
 <span>  laplacian <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  regularize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  align <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  trace <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -97,7 +96,7 @@ If <code>bootstrap&gt;1</code>, the test statistics will be averaged across boot
 and the p-values will be calculated based on the averaged statistics.</p></dd>
 
 
-<dt>split</dt>
+<dt>test_portion</dt>
 <dd><p><code>numeric(1)</code>, the proportion of leave-out edges (into the test set).
 Must take value from (0,1).</p></dd>
 
@@ -121,7 +120,8 @@ previous column.</p></dd>
 
 <dt>laplacian</dt>
 <dd><p><code>logical(1)</code>, use the normalized and regularized adjacency
-matrix (i.e. L)</p></dd>
+matrix (i.e. L)
+This option is experimental and should be used with caution.</p></dd>
 
 
 <dt>regularize</dt>
@@ -129,16 +129,10 @@ matrix (i.e. L)</p></dd>
 The default is <code>TRUE</code>. This is ignored if <code>laplacian=FALSE</code>.</p></dd>
 
 
-<dt>align</dt>
-<dd><p><code>logical(1)</code>, align the trained singular vectors with those of
-the full graph. The default is <code>FALSE</code>.
-This option is experimental and should be used with caution.</p></dd>
-
-
 <dt>trace</dt>
 <dd><p><code>logical(1)</code>, for diagnostic use. If <code>TRUE</code>, return additionally
 <code>cv_stats</code> containing the test statistics of every bootstrap, and if
-<code>align=TRUE</code>, then the eigs of the full graph.</p></dd>
+<code>n=TRUE</code>, then the eigs of the full graph.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -155,7 +149,7 @@ This option is experimental and should be used with caution.</p></dd>
 <dt>bootstrap</dt>
 <dd><p>number of bootstraps performed.</p></dd>
 
-<dt>split</dt>
+<dt>test_portion</dt>
 <dd><p>graph splitting probability used.</p></dd>
 
 <dt>alpha</dt>
@@ -171,7 +165,7 @@ This option is experimental and should be used with caution.</p></dd>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by Fan Chen, Karl Rohe.</p>
+  <p></p><p>Developed by Fan Chen, Alex Hayes, Karl Rohe.</p>
 </div>
 
 <div class="pkgdown-footer-right">
