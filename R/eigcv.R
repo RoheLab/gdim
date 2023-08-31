@@ -71,7 +71,7 @@ glaplacian <- function(A, regularize = TRUE) {
     if (any(c(deg_row, deg_row) == 0)) {
       stop(
         "Cannot use Laplacian because some nodes are isolated. ",
-        "Set either \"regularize=TRUE\" or \"laplacian=FALSE\" option."
+        "Set either `regularize=TRUE` or `laplacian=FALSE` option."
       )
     }
     tau_row <- tau_col <- 0
@@ -167,12 +167,10 @@ gdstat <- function(full, test, u, v, split) {
 #'   previous column.
 #' @param laplacian `logical(1)`, use the normalized and regularized adjacency
 #'   matrix (i.e. L)
-#' @param align `logical(1)`, align the trained singular vectors with those of
-#'   the full graph. The default is `FALSE`.
 #'   This option is experimental and should be used with caution.
 #' @param trace `logical(1)`, for diagnostic use. If `TRUE`, return additionally
 #'   `cv_stats` containing the test statistics of every bootstrap, and if
-#'   `align=TRUE`, then the eigs of the full graph.
+#'   `n=TRUE`, then the eigs of the full graph.
 #' @return A `eigcv` object, which contains:
 #'   \item{inference}{inferred graph dimension.}
 #'   \item{summary}{summary table of the tests.}
@@ -188,27 +186,21 @@ gdstat <- function(full, test, u, v, split) {
 eigcv <- function(A, k_max,
                   bootstrap = 10, split = 0.1,
                   alpha = 0.05,
-                  ptol = 1e-32, correct = "none",
+                  ptol = .Machine$double.eps,
+                  correct = c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr",
+                              "none"),
                   laplacian = TRUE,
                   regularize = TRUE,
-                  align = FALSE,
                   trace = FALSE) {
-  ## check
-  # stopifnot("A must be square"= nrow(A) == ncol(A))
-  # stopifnot("A should be symmetric" = Matrix::isSymmetric(A))
   n <- min(dim(A))
-  stopifnot("\"k_max\" is too large." = k_max <= n)
-  stopifnot("\"split\" must range between 0 and 1." = (split > 0 && split < 1))
-  stopifnot("\"bootstrap\" must be a positive integer." = bootstrap >= 1)
-  # stopifnot("Unknown \"meta\" method." = meta %in% c("z", "p"))
+  stopifnot("`k_max` is too large." = k_max <= n)
+  stopifnot("`split` must range between 0 and 1." = (split > 0 && split < 1))
+  stopifnot("`bootstrap` must be a positive integer." = bootstrap >= 1)
 
   ## full graph
   full <- A <- A * 1
   if (laplacian) {
     full <- glaplacian(A, regularize = regularize)
-  }
-  if (align) {
-    gs_full <- gspectral(full, k_max)
   }
 
   cv_stats <- tibble::tibble(
@@ -228,21 +220,13 @@ eigcv <- function(A, k_max,
     test <- es$test
     if (laplacian) {
       train <- glaplacian(es$train, regularize = regularize)
-      # test <- glaplacian(es$test, regularize = regularize)
     }
 
     ## graph spectral
     gs <- gspectral(train, k_max)
-    if (align) {
-      ## apply Procrustes rotation
-      Su <- svd(crossprod(gs$u, gs_full$u))
-      U <- gs$u %*% tcrossprod(Su$u, Su$v)
-      Sv <- svd(crossprod(gs$v, gs_full$v))
-      V <- gs$v %*% tcrossprod(Sv$u, Sv$v)
-    } else {
-      U <- gs$u
-      V <- gs$v
-    }
+    U <- gs$u
+    V <- gs$v
+
 
     ## sequential test statistics
     for (k in 1:k_max) {
@@ -291,9 +275,6 @@ eigcv <- function(A, k_max,
 
   if (trace) {
     res$stats <- cv_stats
-    if (align) {
-      res$spectral <- gs_full
-    }
   }
   class(res) <- "eigcv"
   return(res)
@@ -309,16 +290,14 @@ eigcv <- function(A, k_max,
 #' @param ... additional input to generic [print].
 #' @return Print an `eigcv` object interactively.
 #' @export
-print.eigcv <- function(x, verbose = TRUE, ...) {
+print.eigcv <- function(x,  ...) {
   cat("Estimated graph dimension:\t", x$inference, fill = TRUE)
-  if (verbose) {
     cat("\nNumber of bootstraps:\t\t", x$bootstrap, fill = TRUE)
     cat("Edge splitting probabaility:\t", x$split, fill = TRUE)
     cat("Significance level:\t\t", x$alpha, fill = TRUE)
     cat("\n ------------ Summary of Tests ------------\n")
     print(data.frame(x$summary[, -c(2, 3)]), row.names = FALSE)
     cat(fill = TRUE)
-  }
 }
 
 #' Plot `eigcv`
