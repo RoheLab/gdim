@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://rohelab.github.io/gdim/dev/LICENSE.html</loc>
+  </url>
+  <url>
+    <loc>https://rohelab.github.io/gdim/dev/authors.html</loc>
+  </url>
+  <url>
+    <loc>https://rohelab.github.io/gdim/dev/index.html</loc>
+  </url>
+  <url>
+    <loc>https://rohelab.github.io/gdim/dev/news/index.html</loc>
+  </url>
+  <url>
+    <loc>https://rohelab.github.io/gdim/dev/reference/eigcv.html</loc>
+  </url>
+  <url>
+    <loc>https://rohelab.github.io/gdim/dev/reference/gdim-package.html</loc>
+  </url>
+  <url>
+    <loc>https://rohelab.github.io/gdim/dev/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>https://rohelab.github.io/gdim/dev/reference/pipe.html</loc>
+  </url>
+  <url>
+    <loc>https://rohelab.github.io/gdim/dev/reference/plot.eigcv.html</loc>
+  </url>
+  <url>
+    <loc>https://rohelab.github.io/gdim/dev/reference/print.eigcv.html</loc>
+  </url>
+</urlset>
