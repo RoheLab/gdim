@@ -10,11 +10,12 @@ Authors@R: c(
   )
 Description: Cross-validated eigenvalues are estimated by
     splitting a graph into two parts, the training and the test graph.
-    The training graph is use to estimate eigenvectors, and
-    the test graph is use to evaluate the correlation between the training
+    The training graph is used to estimate eigenvectors, and
+    the test graph is used to evaluate the correlation between the training
     eigenvectors and the eigenvectors of the test graph.
     The correlations follow a simple central limit theorem that can
-    be used to estimate graph dimension via hypothesis testing.
+    be used to estimate graph dimension via hypothesis testing, see
+    Chen et al. (2021) <arXiv:2108.03336> for details.
 License: GPL (>= 3)
 URL: https://github.com/RoheLab/gdim, https://rohelab.github.io/gdim/
 BugReports: https://github.com/RoheLab/gdim/issues

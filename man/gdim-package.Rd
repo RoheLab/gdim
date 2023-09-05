@@ -6,7 +6,7 @@
 \alias{gdim-package}
 \title{gdim: Estimate Graph Dimension using Cross-Validated Eigenvalues}
 \description{
-Cross-validated eigenvalues are estimated by splitting a graph into two parts, the training and the test graph. The training graph is use to estimate eigenvectors, and the test graph is use to evaluate the correlation between the sample eigenvectors and the eigenspace of the test graph. The correlations follow a simple central limit theorem that can be used to estimate graph dimension via hypothesis testing.
+Cross-validated eigenvalues are estimated by splitting a graph into two parts, the training and the test graph. The training graph is used to estimate eigenvectors, and the test graph is used to evaluate the correlation between the training eigenvectors and the eigenvectors of the test graph. The correlations follow a simple central limit theorem that can be used to estimate graph dimension via hypothesis testing, see Chen et al. (2021) \href{https://arxiv.org/abs/2108.03336}{arXiv:2108.03336} for details.
 }
 \seealso{
 Useful links:
