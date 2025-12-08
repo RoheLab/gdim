@@ -49,7 +49,6 @@ diag(B) <- 0.3
 
 model <- sbm(
   n = 1000,
-  k = 5,
   B = B,
   expected_degree = 40,
   poisson_edges = FALSE,
