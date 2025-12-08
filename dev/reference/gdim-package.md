@@ -6,7 +6,8 @@ estimate eigenvectors, and the test graph is used to evaluate the
 correlation between the training eigenvectors and the eigenvectors of
 the test graph. The correlations follow a simple central limit theorem
 that can be used to estimate graph dimension via hypothesis testing, see
-Chen et al. (2021) [arXiv:2108.03336](https://arxiv.org/abs/2108.03336)
+Chen et al. (2021)
+[doi:10.48550/arXiv:2108.03336](https://doi.org/10.48550/arXiv%3A2108.03336)
 for details.
 
 ## See also
