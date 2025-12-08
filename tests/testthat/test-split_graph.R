@@ -1,5 +1,4 @@
 test_that("multiplication works", {
-
   set.seed(17)
 
   M <- rsparsematrix(8, 12, nnz = 30, rand.x = NULL)

@@ -1,7 +1,6 @@
 library(fastRG)
 
 test_that("symmetric eigcv, calculations on A", {
-
   set.seed(27)
 
   B <- matrix(0.1, 5, 5)
@@ -9,7 +8,6 @@ test_that("symmetric eigcv, calculations on A", {
 
   model <- sbm(
     n = 1000,
-    k = 5,
     B = B,
     expected_degree = 40,
     poisson_edges = FALSE,
@@ -31,7 +29,6 @@ test_that("symmetric eigcv, calculations on A", {
 })
 
 test_that("asymmetric eigcv, calculations on A", {
-
   set.seed(27)
 
   B <- matrix(0.1, nrow = 5, ncol = 8)
@@ -43,8 +40,6 @@ test_that("asymmetric eigcv, calculations on A", {
     theta_in = rep(1, n),
     theta_out = rep(1, n),
     B = B,
-    k_in = 5,
-    k_out = 8,
     expected_density = 0.05
   )
 
@@ -65,7 +60,6 @@ test_that("asymmetric eigcv, calculations on A", {
 library(fastRG)
 
 test_that("symmetric eigcv, calculations on L", {
-
   set.seed(27)
 
   B <- matrix(0.1, 5, 5)
@@ -73,7 +67,6 @@ test_that("symmetric eigcv, calculations on L", {
 
   model <- sbm(
     n = 1000,
-    k = 5,
     B = B,
     expected_degree = 40,
     poisson_edges = FALSE,
@@ -95,7 +88,6 @@ test_that("symmetric eigcv, calculations on L", {
 })
 
 test_that("asymmetric eigcv, calculations on A", {
-
   set.seed(27)
 
   B <- matrix(0.1, nrow = 5, ncol = 8)
@@ -107,8 +99,6 @@ test_that("asymmetric eigcv, calculations on A", {
     theta_in = rep(1, n),
     theta_out = rep(1, n),
     B = B,
-    k_in = 5,
-    k_out = 8,
     expected_density = 0.05
   )
 
@@ -125,4 +115,3 @@ test_that("asymmetric eigcv, calculations on A", {
     5
   )
 })
-

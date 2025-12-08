@@ -1,7 +1,5 @@
-
 # assumes elements of A are non-negative integers (and Poisson)
 split_graph <- function(A, test_portion = 0.1) {
-
   A <- methods::as(A, "dMatrix")
   A <- methods::as(A, "TsparseMatrix")
 
@@ -45,11 +43,14 @@ glaplacian <- function(A, regularize = TRUE) {
 # given the training singular vectors, compute the test statistic for
 # graph dimension.
 gdstat <- function(full, test, u, v, test_portion) {
-
   # standard error calculation is different for directed and undirected graphs
   if (isSymmetric(full)) {
-    se <- sqrt(2 * test_portion * as.numeric(t(u^2) %*% full %*% v^2) -
-      test_portion * sum(diag(full) * u^2 * v^2))
+    se <- sqrt(
+      2 *
+        test_portion *
+        as.numeric(t(u^2) %*% full %*% v^2) -
+        test_portion * sum(diag(full) * u^2 * v^2)
+    )
   } ## standard error
   if (!isSymmetric(full)) {
     se <- sqrt(test_portion * as.numeric(t(u^2) %*% full %*% v^2))
@@ -59,7 +60,6 @@ gdstat <- function(full, test, u, v, test_portion) {
   z <- as.numeric(t(u) %*% test %*% v) / se ## test stat
   c(cv_lambda_A = lamA, cv_lambda_L = lamL, z = z)
 }
-
 
 
 #' Compute cross-validate eigenvalues
@@ -124,17 +124,16 @@ gdstat <- function(full, test, u, v, test_portion) {
 #' diag(B) <- 0.3
 #'
 #' model <- sbm(
-#'   n = 1000,
-#'   k = 5,
+#'   n = 200,
 #'   B = B,
-#'   expected_degree = 40,
+#'   expected_degree = 20,
 #'   poisson_edges = FALSE,
 #'   allow_self_loops = FALSE
 #' )
 #'
 #' A <- sample_sparse(model)
 #'
-#' eigs<- eigcv(A, k_max = 10)
+#' eigs<- eigcv(A, k_max = 7)
 #' eigs
 #'
 #' plot(eigs, type = "z-score")    # default
@@ -142,17 +141,35 @@ gdstat <- function(full, test, u, v, test_portion) {
 #' plot(eigs, type = "laplacian")
 #'
 #'
-eigcv <- function(A, k_max,
-                  ...,
-                  num_bootstraps = 10, test_portion = 0.1,
-                  alpha = 0.05,
-                  method = c("none", "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr"),
-                  laplacian = FALSE,
-                  regularize = TRUE) {
+eigcv <- function(
+  A,
+  k_max,
+  ...,
+  num_bootstraps = 10,
+  test_portion = 0.1,
+  alpha = 0.05,
+  method = c(
+    "none",
+    "holm",
+    "hochberg",
+    "hommel",
+    "bonferroni",
+    "BH",
+    "BY",
+    "fdr"
+  ),
+  laplacian = FALSE,
+  regularize = TRUE
+) {
   n <- min(dim(A))
   stopifnot("`k_max` is too large." = k_max <= n)
-  stopifnot("`test_portion` must range between 0 and 1." = (test_portion > 0 && test_portion < 1))
-  stopifnot("`num_bootstraps` must be a positive integer." = num_bootstraps >= 1)
+  stopifnot(
+    "`test_portion` must range between 0 and 1." = (test_portion > 0 &&
+      test_portion < 1)
+  )
+  stopifnot(
+    "`num_bootstraps` must be a positive integer." = num_bootstraps >= 1
+  )
 
   method <- rlang::arg_match(method)
 
@@ -179,7 +196,6 @@ eigcv <- function(A, k_max,
 
   tick <- 0
   for (boot in 1:num_bootstraps) {
-
     # must split on adjacency matrix A, even if computing cv-eigs for
     # graph Laplacian
 
@@ -196,24 +212,29 @@ eigcv <- function(A, k_max,
 
     for (k in 1:k_max) {
       tick <- tick + 1
-      gds <- gdstat(full = A, test = test, u = s_train$u[, k], v = s_train$v[, k], test_portion = test_portion)
+      gds <- gdstat(
+        full = A,
+        test = test,
+        u = s_train$u[, k],
+        v = s_train$v[, k],
+        test_portion = test_portion
+      )
       cv_stats[tick, 1:5] <- matrix(c(boot, k, gds), nrow = 1)
     }
 
     pb$tick()
   }
 
-  cv_means <- cv_stats %>%
-    dplyr::group_by(k) %>%
+  cv_means <- cv_stats |>
+    dplyr::group_by(k) |>
     dplyr::summarise(
       cv_lambda_A = mean(cv_lambda_A),
       cv_lambda_L = mean(cv_lambda_L),
       z = mean(z)
-    ) %>%
+    ) |>
     dplyr::ungroup()
 
-
-  cv_means <- cv_means %>%
+  cv_means <- cv_means |>
     dplyr::mutate(
       pvals = stats::pnorm(z, lower.tail = FALSE)
     )
@@ -246,7 +267,7 @@ eigcv <- function(A, k_max,
 #' @return `x`, but invisibly.
 #'
 #' @method print eigcv
-print.eigcv <- function(x,  ...) {
+print.eigcv <- function(x, ...) {
   cat("Estimated graph dimension:\t", x$estimated_dimension, fill = TRUE)
   cat("\nNumber of bootstraps:\t\t", x$num_bootstraps, fill = TRUE)
   cat("Edge splitting probabaility:\t", x$test_portion, fill = TRUE)
@@ -278,7 +299,12 @@ print.eigcv <- function(x,  ...) {
 #' @method plot eigcv
 #'
 #' @inherit eigcv examples
-plot.eigcv <- function(x, type = c("z-score", "adjacency", "laplacian"), threshold = 2, ...) {
+plot.eigcv <- function(
+  x,
+  type = c("z-score", "adjacency", "laplacian"),
+  threshold = 2,
+  ...
+) {
   stopifnot("Threshold of statistics must be greater than 0." = threshold > 0)
 
   type <- rlang::arg_match(type)
@@ -310,8 +336,11 @@ plot.eigcv <- function(x, type = c("z-score", "adjacency", "laplacian"), thresho
   if (type == "z-score") {
     g <- g +
       ggplot2::geom_hline(
-        yintercept = threshold, alpha = .8,
-        linetype = 2, color = "grey60", show.legend = TRUE
+        yintercept = threshold,
+        alpha = .8,
+        linetype = 2,
+        color = "grey60",
+        show.legend = TRUE
       )
   }
 

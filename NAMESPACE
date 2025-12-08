@@ -2,7 +2,5 @@
 
 S3method(plot,eigcv)
 S3method(print,eigcv)
-export("%>%")
 export(eigcv)
 import(Matrix)
-importFrom(magrittr,"%>%")

@@ -86,17 +86,16 @@ B <- matrix(0.1, 5, 5)
 diag(B) <- 0.3
 
 model <- sbm(
-  n = 1000,
-  k = 5,
+  n = 200,
   B = B,
-  expected_degree = 40,
+  expected_degree = 20,
   poisson_edges = FALSE,
   allow_self_loops = FALSE
 )
 
 A <- sample_sparse(model)
 
-eigs<- eigcv(A, k_max = 10)
+eigs<- eigcv(A, k_max = 7)
 eigs
 
 plot(eigs, type = "z-score")    # default
